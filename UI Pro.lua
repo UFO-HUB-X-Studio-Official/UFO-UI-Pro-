@@ -170,33 +170,173 @@ do
     TitleCenter.Text = '<font color="#FFFFFF">UFO</font> <font color="#00FF8C">HUB X</font>'
     TitleCenter.TextColor3 = TEXT_WHITE; TitleCenter.ZIndex = 61
 end
--- BODY
+--========================
+-- BODY (ONE DROP-IN)
+--========================
+local Players   = game:GetService("Players")
+local RunS      = game:GetService("RunService")
+local TS        = game:GetService("TweenService")
+local UIS       = game:GetService("UserInputService")
+local LP        = Players.LocalPlayer
+
+-- ขนาด/ระยะ
+local GAP_OUTER   = 10
+local GAP_BETWEEN = 8
+local LEFT_RATIO  = 0.28
+local RIGHT_RATIO = 1 - LEFT_RATIO
+
+--========================
+-- โครงหลัก
+--========================
 local Body = Instance.new("Frame", Window)
-Body.BackgroundTransparency = 1; Body.Position = UDim2.new(0,0,0,46); Body.Size = UDim2.new(1,0,1,-46)
+Body.BackgroundTransparency = 1
+Body.Position = UDim2.new(0,0,0,46)
+Body.Size     = UDim2.new(1,0,1,-46)
 
 local Inner = Instance.new("Frame", Body)
-Inner.BackgroundColor3 = BG_INNER; Inner.BorderSizePixel = 0
-Inner.Position = UDim2.new(0,8,0,8); Inner.Size = UDim2.new(1,-16,1,-16); corner(Inner, 12)
+Inner.BackgroundColor3 = BG_INNER
+Inner.BorderSizePixel  = 0
+Inner.Position = UDim2.new(0,8,0,8)
+Inner.Size     = UDim2.new(1,-16,1,-16)
+corner(Inner, 12)
 
 local Content = Instance.new("Frame", Body)
-Content.BackgroundColor3 = BG_PANEL; Content.Position = UDim2.new(0,GAP_OUTER,0,GAP_OUTER)
-Content.Size = UDim2.new(1,-GAP_OUTER*2,1,-GAP_OUTER*2); corner(Content, 12); stroke(Content, 0.5, MINT, 0.35)
+Content.BackgroundColor3 = BG_PANEL
+Content.Position = UDim2.new(0,GAP_OUTER,0,GAP_OUTER)
+Content.Size     = UDim2.new(1,-GAP_OUTER*2,1,-GAP_OUTER*2)
+corner(Content, 12); stroke(Content, 0.5, MINT, 0.35)
 
 local Columns = Instance.new("Frame", Content)
-Columns.BackgroundTransparency = 1; Columns.Position = UDim2.new(0,8,0,8); Columns.Size = UDim2.new(1,-16,1,-16)
+Columns.BackgroundTransparency = 1
+Columns.Position = UDim2.new(0,8,0,8)
+Columns.Size     = UDim2.new(1,-16,1,-16)
 
+--========================
+-- ซ้าย/ขวา (ขอให้มีไว้เสมอ)
+--========================
 local Left = Instance.new("Frame", Columns)
-Left.BackgroundColor3 = Color3.fromRGB(16,16,16); Left.Size = UDim2.new(LEFT_RATIO, -GAP_BETWEEN/2, 1, 0)
-Left.ClipsDescendants = true; corner(Left, 10); stroke(Left, 1.2, GREEN, 0); stroke(Left, 0.45, MINT, 0.35)
+Left.Name = "LeftPanel"
+Left.BackgroundColor3 = Color3.fromRGB(16,16,16)
+Left.Size  = UDim2.new(LEFT_RATIO, -GAP_BETWEEN/2, 1, 0)
+Left.ClipsDescendants = true
+corner(Left, 10); stroke(Left, 1.2, GREEN, 0); stroke(Left, 0.45, MINT, 0.35)
 
 local Right = Instance.new("Frame", Columns)
+Right.Name = "RightPanel"
 Right.BackgroundColor3 = Color3.fromRGB(16,16,16)
 Right.Position = UDim2.new(LEFT_RATIO, GAP_BETWEEN, 0, 0)
-Right.Size = UDim2.new(RIGHT_RATIO, -GAP_BETWEEN/2, 1, 0)
-Right.ClipsDescendants = true; corner(Right, 10); stroke(Right, 1.2, GREEN, 0); stroke(Right, 0.45, MINT, 0.35)
+Right.Size     = UDim2.new(RIGHT_RATIO, -GAP_BETWEEN/2, 1, 0)
+Right.ClipsDescendants = true
+corner(Right, 10); stroke(Right, 1.2, GREEN, 0); stroke(Right, 0.45, MINT, 0.35)
 
+-- พื้นหลัง (ซ้าย/ขวา) — ถ้าไม่อยากได้ ลบบรรทัดสองอันนี้ได้
 local imgL = Instance.new("ImageLabel", Left)
-imgL.BackgroundTransparency = 1; imgL.Size = UDim2.new(1,0,1,0); imgL.Image = IMG_SMALL; imgL.ScaleType = Enum.ScaleType.Crop
+imgL.BackgroundTransparency = 1; imgL.Size = UDim2.new(1,0,1,0)
+imgL.Image = IMG_SMALL or ""; imgL.ScaleType = Enum.ScaleType.Crop; imgL.ZIndex = 0
 
 local imgR = Instance.new("ImageLabel", Right)
-imgR.BackgroundTransparency = 1; imgR.Size = UDim2.new(1,0,1,0); imgR.Image = IMG_LARGE; imgR.ScaleType = Enum.ScaleType.Crop
+imgR.BackgroundTransparency = 1; imgR.Size = UDim2.new(1,0,1,0)
+imgR.Image = IMG_LARGE or ""; imgR.ScaleType = Enum.ScaleType.Crop; imgR.ZIndex = 0
+--==========================================================
+-- UFO RECOVERY PATCH (Final Fix v3: sync flag + block camera drag)
+--==========================================================
+do
+    local CoreGui = game:GetService("CoreGui")
+    local UIS     = game:GetService("UserInputService")
+    local CAS     = game:GetService("ContextActionService")
+
+    local function findMain()
+        local gui = CoreGui:FindFirstChild("UFO_HUB_X_UI")
+        local win
+        if gui then win = gui:FindFirstChildWhichIsA("Frame") end
+        return gui, win
+    end
+
+    local function showUI()
+        local gui, win = findMain()
+        if gui then gui.Enabled = true end
+        if win then win.Visible = true end
+        getgenv().UFO_ISOPEN = true
+    end
+
+    local function hideUI()
+        local gui, win = findMain()
+        if win then win.Visible = false end
+        getgenv().UFO_ISOPEN = false
+    end
+
+    -- ตั้งค่า flag เริ่มตามสถานะจริงของหน้าต่าง (กันกดครั้งแรกไม่ขึ้น)
+    do
+        local _, win = findMain()
+        getgenv().UFO_ISOPEN = (win and win.Visible) and true or false
+    end
+
+    -- ปุ่ม X ทั้งระบบ -> ซ่อน + sync flag (กันกดเปิดต้องกดสองครั้ง)
+    for _,o in ipairs(CoreGui:GetDescendants()) do
+        if o:IsA("TextButton") and o.Text and o.Text:upper()=="X" then
+            o.MouseButton1Click:Connect(function() hideUI() end)
+        end
+    end
+
+    -- ปุ่ม Toggle (ImageButton) + กรอบเขียว + ลากได้ + บล็อกกล้องขณะลาก
+    local toggleGui = CoreGui:FindFirstChild("UFO_HUB_X_Toggle")
+    if toggleGui then toggleGui:Destroy() end
+
+    local ToggleGui = Instance.new("ScreenGui", CoreGui)
+    ToggleGui.Name = "UFO_HUB_X_Toggle"; ToggleGui.IgnoreGuiInset = true
+
+    local ToggleBtn = Instance.new("ImageButton", ToggleGui)
+    ToggleBtn.Size = UDim2.fromOffset(64,64); ToggleBtn.Position = UDim2.fromOffset(80,200)
+    ToggleBtn.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    ToggleBtn.BorderSizePixel = 0
+    ToggleBtn.Image = "rbxassetid://117052960049460"
+    local c = Instance.new("UICorner", ToggleBtn); c.CornerRadius = UDim.new(0,8)
+    local s = Instance.new("UIStroke", ToggleBtn); s.Thickness=2; s.Color=GREEN
+
+    local function toggleUI()
+        if getgenv().UFO_ISOPEN then hideUI() else showUI() end
+    end
+    ToggleBtn.MouseButton1Click:Connect(toggleUI)
+
+    UIS.InputBegan:Connect(function(i,gp)
+        if gp then return end
+        if i.KeyCode==Enum.KeyCode.RightShift then toggleUI() end
+    end)
+
+    -- Drag ปุ่มสี่เหลี่ยม + block camera
+    do
+        local dragging=false; local start; local startPos
+        local function bindBlock(on)
+            local name="UFO_BlockLook_Toggle"
+            if on then
+                local fn=function() return Enum.ContextActionResult.Sink end
+                CAS:BindActionAtPriority(name, fn, false, 9000,
+                    Enum.UserInputType.MouseMovement,
+                    Enum.UserInputType.Touch,
+                    Enum.UserInputType.MouseButton1)
+            else
+                pcall(function() CAS:UnbindAction(name) end)
+            end
+        end
+
+        ToggleBtn.InputBegan:Connect(function(i)
+            if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+                dragging=true; start=i.Position
+                startPos=Vector2.new(ToggleBtn.Position.X.Offset, ToggleBtn.Position.Y.Offset)
+                bindBlock(true)
+                i.Changed:Connect(function()
+                    if i.UserInputState==Enum.UserInputState.End then
+                        dragging=false; bindBlock(false)
+                    end
+                end)
+            end
+        end)
+
+        UIS.InputChanged:Connect(function(i)
+            if dragging and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
+                local d=i.Position-start
+                ToggleBtn.Position=UDim2.fromOffset(startPos.X+d.X,startPos.Y+d.Y)
+            end
+        end)
+    end
+end
