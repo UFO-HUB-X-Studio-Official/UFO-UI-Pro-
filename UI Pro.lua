@@ -174,7 +174,7 @@ RL:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     RightList.CanvasSize=UDim2.new(0,0,0,RL.AbsoluteContentSize.Y+8)
 end)
 
--- ===== ซ่อนแท่งสกอร์บาร์แนวตั้ง (เอาเส้นสีขาวออก แต่ยังเลื่อนลื่น) =====
+-- ===== เพิ่ม: ซ่อนสกอร์บาร์แนวตั้ง (เอาเส้นสีขาวออก) แต่ยังเลื่อนได้ปกติ =====
 local function hideScrollbar(sf)
     sf.ScrollBarThickness = 0
     sf.ScrollBarImageTransparency = 1
@@ -184,7 +184,7 @@ local function hideScrollbar(sf)
 end
 hideScrollbar(LeftList)
 hideScrollbar(RightList)
--- =====================================================
+-- ========================================================================
 
 -- ป้ายชื่อ (มุมซ้ายบนแผงขวา) แสดงไอคอน+ชื่อปุ่มที่เลือก
 local ActiveBadge = Instance.new("Frame", Right)
@@ -197,7 +197,7 @@ ABText.Font=Enum.Font.GothamSemibold; ABText.TextSize=14; ABText.TextColor3=TEXT
 
 -- ฟังก์ชันสร้างปุ่มสี่เหลี่ยมขอบเขียว (ซ้าย) + อัปเดตป้ายชื่อ
 local function CreateLeftButton(name, assetId)
-    local H=28
+    local H=28 -- ความสูงตามแท่งสีขาวในรูป
     local btn=Instance.new("TextButton", LeftList)
     btn.Name="Btn_"..name; btn.AutoButtonColor=false; btn.Size=UDim2.new(1,0,0,H)
     btn.BackgroundColor3=Color3.fromRGB(20,20,20); btn.Text=""; btn.BorderSizePixel=0
@@ -222,7 +222,7 @@ local function CreateLeftButton(name, assetId)
 end
 
 -- ====== สร้างปุ่มที่ขอ: player + รูป ======
-CreateLeftButton("player", "116976545042904")
+CreateLeftButton("player", 116976545042904)
 -- แสดงชื่อ/รูปทันทีเหมือนกดแล้ว
 do
     ABIcon.Image = "rbxassetid://116976545042904"
