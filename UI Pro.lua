@@ -1,12 +1,8 @@
 --======================================================
--- UFO HUB X UI Pro | Scrollable Edition (All-in-One)
--- - UI เหมือนเดิม 100% + เลื่อนซ้าย/ขวาได้
--- - ปรับง่าย: สี/ขนาด/สัดส่วน อยู่ด้านบน
--- - API สไตล์ Kavo: CreateLib -> NewTab -> NewSection -> NewButton/Label
--- - ใช้ได้ทั้งรันตรง ๆ และ loadstring(game:HttpGet("..."))()
+-- UFO HUB X UI Pro | Stable Build (Big Size + Scroll + Demo)
 --======================================================
 
--- 0) ล้างของเดิม
+-- ล้างของเดิม
 pcall(function()
     local cg = game:GetService("CoreGui")
     for _,n in ipairs({"UFO_HUB_X_UI","UFO_HUB_X_Toggle"}) do
@@ -15,7 +11,7 @@ pcall(function()
     end
 end)
 
--- 1) CONFIG ง่าย ๆ (แก้แค่ตรงนี้ได้ 90%)
+-- ---------- CONFIG ----------
 local THEME = {
     GREEN        = Color3.fromRGB(0,255,140),
     MINT         = Color3.fromRGB(120,255,220),
@@ -32,17 +28,17 @@ local THEME = {
     BTN_ACTIVE   = Color3.fromRGB(36,36,44),
     CARD_FILL    = Color3.fromRGB(28,28,34),
     CARD_STROKE  = Color3.fromRGB(100,160,140),
+    TEXT_DIM     = Color3.fromRGB(180,190,200),
 }
 
--- ขนาดและสัดส่วน (ถ้าดูใหญ่/เล็กไป ปรับ WIN_W, WIN_H หรือสัดส่วนซ้าย/ขวา)
+-- ขนาด “ใหญ่สวย” + autoscale ไม่บีบเล็กไป
 local SIZE = {
-    WIN_W = 560, WIN_H = 320,      -- ขนาดหน้าต่างพื้นฐาน
+    WIN_W = 720, WIN_H = 400,
     GAP_OUTER = 12, GAP_BETWEEN = 10,
-    LEFT_RATIO = 0.24, RIGHT_RATIO = 0.76,
+    LEFT_RATIO = 0.26, RIGHT_RATIO = 0.74,
     HEADER_H = 46
 }
 
--- รูปภาพตกแต่ง (เปลี่ยนได้)
 local IMGS = {
     SMALL = "rbxassetid://121069267171370",
     LARGE = "rbxassetid://108408843188558",
@@ -51,7 +47,7 @@ local IMGS = {
     TOGGLE= "rbxassetid://117052960049460",
 }
 
--- 2) HELPERS
+-- ---------- HELPERS ----------
 local function corner(gui, r)
     local c = Instance.new("UICorner", gui); c.CornerRadius = UDim.new(0, r or 10); return c
 end
@@ -65,14 +61,14 @@ local function gradient(gui, c1, c2, rot)
     local g = Instance.new("UIGradient", gui); g.Color = ColorSequence.new(c1, c2); g.Rotation = rot or 0; return g
 end
 
--- 3) Services
+-- ---------- Services ----------
 local CoreGui = game:GetService("CoreGui")
 local UIS     = game:GetService("UserInputService")
 local RunS    = game:GetService("RunService")
 local CAS     = game:GetService("ContextActionService")
 
 --======================================================
--- 4) สร้าง UI หลัก (เหมือนดีไซน์เดิม 100%) + Scroll ทั้งสองฝั่ง
+-- สร้าง UI หลัก (ดีไซน์เดิม 100%) + Scroll ซ้าย/ขวา
 --======================================================
 local function buildUIMain()
     if CoreGui:FindFirstChild("UFO_HUB_X_UI") then return CoreGui.UFO_HUB_X_UI end
@@ -95,11 +91,11 @@ local function buildUIMain()
     Glow.Image = IMGS.GLOW; Glow.ImageColor3 = THEME.GREEN; Glow.ImageTransparency = 0.78
     Glow.ScaleType = Enum.ScaleType.Slice; Glow.SliceCenter = Rect.new(24,24,276,276); Glow.ZIndex = 0
 
-    -- Autoscale (รองรับมือถือ/PC ทุกจอ)
+    -- Autoscale (ไม่ย่อเล็กเกินไป)
     local UIScale = Instance.new("UIScale", Window)
     local function fit()
         local v = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize or Vector2.new(1280,720)
-        UIScale.Scale = math.clamp(math.min(v.X/920, v.Y/580), 0.64, 1.0)
+        UIScale.Scale = math.clamp(math.min(v.X/960, v.Y/600), 0.80, 1.05)
     end
     fit(); RunS.RenderStepped:Connect(fit)
 
@@ -185,13 +181,12 @@ local function buildUIMain()
     Columns.Name = "Columns"; Columns.BackgroundTransparency = 1
     Columns.Position = UDim2.new(0,8,0,8); Columns.Size = UDim2.new(1,-16,1,-16)
 
-    -- LEFT: แท็บ (Scrolling)
+    -- LEFT (แท็บ) - Scrolling
     local Left = Instance.new("ScrollingFrame", Columns)
     Left.Name = "Left"
     Left.BackgroundColor3 = THEME.BG_INNER
     Left.Size = UDim2.new(SIZE.LEFT_RATIO, -SIZE.GAP_BETWEEN/2, 1, 0)
     Left.ScrollBarThickness = 3; Left.CanvasSize = UDim2.new()
-    Left.AutomaticCanvasSize = Enum.AutomaticSize.None -- เราจะคุมเองด้วย Layout
     Left.ClipsDescendants = true
     corner(Left, 10); stroke(Left, 1.1, THEME.GREEN, 0.08); stroke(Left, 0.6, THEME.MINT, 0.28)
     local padL = Instance.new("UIPadding", Left)
@@ -202,7 +197,7 @@ local function buildUIMain()
         Left.CanvasSize = UDim2.new(0,0,0, listL.AbsoluteContentSize.Y + 12)
     end)
 
-    -- RIGHT: เนื้อหา (Scrolling)
+    -- RIGHT (เนื้อหา) - Scrolling
     local Right = Instance.new("ScrollingFrame", Columns)
     Right.Name = "Right"
     Right.BackgroundColor3 = THEME.BG_INNER
@@ -214,21 +209,16 @@ local function buildUIMain()
     local padR = Instance.new("UIPadding", Right)
     padR.PaddingTop = UDim.new(0,8); padR.PaddingLeft = UDim.new(0,8); padR.PaddingRight = UDim.new(0,8); padR.PaddingBottom = UDim.new(0,8)
 
-    -- โฮสต์เพจจริง (ขวาด้านใน) -> จะสลับ Page ให้โชว์แค่หน้าเดียว
     local PageHost = Instance.new("Frame", Right)
     PageHost.Name = "PageHost"; PageHost.BackgroundTransparency = 1; PageHost.Size = UDim2.new(1, -12, 1, -12)
     PageHost.Position = UDim2.new(0,6,0,6)
-    local layPages = Instance.new("UIListLayout", PageHost) -- ใช้เพื่อคำนวณ CanvasSize
+    local layPages = Instance.new("UIListLayout", PageHost)
     layPages.Padding = UDim.new(0,0)
     layPages:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         Right.CanvasSize = UDim2.new(0,0,0, layPages.AbsoluteContentSize.Y + 12)
     end)
 
-    -- พรีวิวรูป (ถ้าไม่ชอบ ลบ 5 บรรทัดนี้ได้)
-    local imgR = Instance.new("ImageLabel", PageHost)
-    imgR.BackgroundTransparency = 1; imgR.Size = UDim2.new(1,0,0,1); imgR.Visible = false
-
-    -- UFO + Halo ตกแต่งหัว
+    -- UFO + Halo ที่หัว
     do
         local UFO = Instance.new("ImageLabel", Window)
         UFO.Name = "UFO_Top"; UFO.BackgroundTransparency = 1; UFO.Image = IMGS.UFO
@@ -241,7 +231,7 @@ local function buildUIMain()
         Halo.Image = IMGS.GLOW; Halo.ImageColor3 = THEME.MINT_SOFT; Halo.ImageTransparency = 0.72; Halo.ZIndex = 50
     end
 
-    -- RECOVERY / TOGGLE ปุ่มเปิด-ปิด + ลากได้
+    -- ปุ่ม Toggle เปิด/ปิด + ลากได้ + RightShift
     do
         local function findMain()
             local gui = CoreGui:FindFirstChild("UFO_HUB_X_UI")
@@ -261,57 +251,50 @@ local function buildUIMain()
         ToggleBtn.Name = "ToggleBtn"
         ToggleBtn.Size = UDim2.fromOffset(64,64); ToggleBtn.Position = UDim2.fromOffset(80,200)
         ToggleBtn.BackgroundColor3 = Color3.fromRGB(0,0,0); ToggleBtn.BorderSizePixel = 0; ToggleBtn.Image = IMGS.TOGGLE
-        corner(ToggleBtn, 8); local s = stroke(ToggleBtn, 2, THEME.GREEN, 0)
+        corner(ToggleBtn, 8); stroke(ToggleBtn, 2, THEME.GREEN, 0)
 
         local function toggleUI() if getgenv().UFO_ISOPEN then hideUI() else showUI() end end
         ToggleBtn.MouseButton1Click:Connect(toggleUI)
         UIS.InputBegan:Connect(function(i,gp) if gp then return end if i.KeyCode==Enum.KeyCode.RightShift then toggleUI() end end)
 
-        -- Drag ToggleBtn
-        do
-            local dragging=false; local start; local startPos
-            local function bindBlock(on)
-                local name="UFO_BlockLook_Toggle"
-                if on then
-                    local fn=function() return Enum.ContextActionResult.Sink end
-                    CAS:BindActionAtPriority(name, fn, false, 9000,
-                        Enum.UserInputType.MouseMovement, Enum.UserInputType.Touch, Enum.UserInputType.MouseButton1)
-                else
-                    pcall(function() CAS:UnbindAction(name) end)
-                end
-            end
-            ToggleBtn.InputBegan:Connect(function(i)
-                if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
-                    dragging=true; start=i.Position
-                    startPos=Vector2.new(ToggleBtn.Position.X.Offset, ToggleBtn.Position.Y.Offset)
-                    bindBlock(true)
-                    i.Changed:Connect(function()
-                        if i.UserInputState==Enum.UserInputState.End then dragging=false; bindBlock(false) end
-                    end)
-                end
-            end)
-            UIS.InputChanged:Connect(function(i)
-                if dragging and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
-                    local d=i.Position-start
-                    ToggleBtn.Position=UDim2.fromOffset(startPos.X+d.X,startPos.Y+d.Y)
-                end
-            end)
+        local dragging=false; local start; local startPos
+        local function bindBlock(on)
+            local name="UFO_BlockLook_Toggle"
+            if on then
+                local fn=function() return Enum.ContextActionResult.Sink end
+                CAS:BindActionAtPriority(name, fn, false, 9000,
+                    Enum.UserInputType.MouseMovement, Enum.UserInputType.Touch, Enum.UserInputType.MouseButton1)
+            else pcall(function() CAS:UnbindAction(name) end) end
         end
+        ToggleBtn.InputBegan:Connect(function(i)
+            if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+                dragging=true; start=i.Position
+                startPos=Vector2.new(ToggleBtn.Position.X.Offset, ToggleBtn.Position.Y.Offset)
+                bindBlock(true)
+                i.Changed:Connect(function() if i.UserInputState==Enum.UserInputState.End then dragging=false; bindBlock(false) end end)
+            end
+        end)
+        UIS.InputChanged:Connect(function(i)
+            if dragging and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
+                local d=i.Position-start
+                ToggleBtn.Position=UDim2.fromOffset(startPos.X+d.X,startPos.Y+d.Y)
+            end
+        end)
     end
 
     return GUI
 end
 
--- สร้าง UI ให้แสดงทันที
+-- แสดง UI เลย
 local _GUI = buildUIMain()
 
 --======================================================
--- 5) UFOPro API (สไตล์ Kavo)
+-- UFOPro API (แท็บ/เซคชัน/ปุ่ม/เลเบล)
 --======================================================
-local UFOPro = { _version = "1.0-scroll" }
+local UFOPro = { _version = "1.0-stable" }
 UFOPro.__index = UFOPro
+getgenv().UFOPro = UFOPro -- เผื่ออยากเรียกจากสคริปต์อื่น
 
--- จับ containers (ซ้าย/ขวา)
 local function findContainers()
     local gui = CoreGui:FindFirstChild("UFO_HUB_X_UI")
     if not gui then return end
@@ -332,14 +315,14 @@ local function makeSideButton(parent, text, active)
     b.Size = UDim2.new(1,0,0,30)
     b.BackgroundColor3 = active and THEME.BTN_ACTIVE or THEME.BTN_IDLE
     b.Text = "· "..text; b.Font = Enum.Font.GothamSemibold; b.TextSize = 14
-    b.TextColor3 = active and Color3.fromRGB(230,255,240) or Color3.fromRGB(180,190,200)
+    b.TextColor3 = active and Color3.fromRGB(230,255,240) or THEME.TEXT_DIM
     b.Parent = parent; corner(b, 10); stroke(b, 1, THEME.MINT, 0.22)
     b.MouseEnter:Connect(function() if not active then b.BackgroundColor3 = THEME.BTN_HOVER end end)
     b.MouseLeave:Connect(function() if not active then b.BackgroundColor3 = THEME.BTN_IDLE end end)
     return b
 end
 
--- เพจเนื้อหา (ด้านขวา) แต่จะจัดการโชว์/ซ่อนไว้เอง
+-- เพจเนื้อหาขวา + สกรอลล์ภายในเพจ
 local function makePage(parent, name)
     local page = Instance.new("Frame", parent)
     page.Name = "Page_"..name
@@ -347,11 +330,11 @@ local function makePage(parent, name)
     page.Size = UDim2.new(1,0,1,0)
     page.Visible = false
 
-    -- คุมรายการภายในด้วย ScrollingFrame ย่อย (จะทำให้ส่วนขวาเลื่อนรวม + ภายในจัดแนวสวย)
     local sf = Instance.new("ScrollingFrame", page)
     sf.Name = "Scroll"; sf.BackgroundTransparency = 1
-    sf.Size = UDim2.new(1,0,1,0); sf.Position = UDim2.new(0,0,0,0)
+    sf.Size = UDim2.new(1,0,1,0)
     sf.ScrollBarThickness = 4; sf.CanvasSize = UDim2.new()
+
     local lay = Instance.new("UIListLayout", sf)
     lay.Padding = UDim.new(0,10); lay.SortOrder = Enum.SortOrder.LayoutOrder
     lay:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
@@ -361,19 +344,114 @@ local function makePage(parent, name)
     return page, sf
 end
 
--- PUBLIC
-function UFOPro.CreateLib(title, theme)
-    if not CoreGui:FindFirstChild("UFO_HUB_X_UI") then buildUIMain() end
-    local gui, win, left, right, host = findContainers()
-    assert(gui and win and left and right and host, "[UFOPro] UI containers not found")
+-- สร้างการ์ด Section
+local function makeSectionCard(parent, title)
+    local holder = Instance.new("Frame", parent)
+    holder.Size = UDim2.new(1,0,0,56)
+    holder.BackgroundColor3 = THEME.CARD_FILL
+    holder.BorderSizePixel = 0
+    corner(holder, 10); stroke(holder, 1, THEME.CARD_STROKE, 0.18)
 
-    -- ตั้งชื่อหัว
-    do
-        local header = win:FindFirstChild("Header")
-        local label = header and header:FindFirstChild("TitleCenter")
-        if label then
-            label.Text = string.format('<font color="#FFFFFF">%s</font> <font color="#00FF8C">HUB X</font>', title or "UFO")
+    local inner = Instance.new("Frame", holder)
+    inner.BackgroundTransparency = 1
+    inner.Size = UDim2.new(1,-20,1,-14)
+    inner.Position = UDim2.new(0,10,0,7)
+
+    local h = Instance.new("UIListLayout", inner)
+    h.FillDirection = Enum.FillDirection.Horizontal
+    h.VerticalAlignment = Enum.VerticalAlignment.Center
+    h.Padding = UDim.new(0,10)
+
+    local dot = Instance.new("Frame", inner)
+    dot.Size = UDim2.fromOffset(8,8)
+    dot.BackgroundColor3 = Color3.fromRGB(86,168,255)
+    dot.BorderSizePixel = 0
+    corner(dot, 8)
+
+    local lab = Instance.new("TextLabel", inner)
+    lab.BackgroundTransparency = 1
+    lab.Size = UDim2.new(1, -18, 1, 0)
+    lab.Font = Enum.Font.GothamSemibold
+    lab.TextSize = 16
+    lab.TextXAlignment = Enum.TextXAlignment.Left
+    lab.TextColor3 = THEME.TEXT_WHITE
+    lab.Text = title or "Section"
+
+    -- คอนเทนต์จริงของ section (เรียงเป็นคอลัมน์)
+    local content = Instance.new("Frame", parent)
+    content.BackgroundTransparency = 1
+    content.Size = UDim2.new(1,0,0,0)
+
+    local v = Instance.new("UIListLayout", content)
+    v.Padding = UDim.new(0,6); v.SortOrder = Enum.SortOrder.LayoutOrder
+
+    -- ทำให้กรุ๊ป (หัว+คอนเทนต์) เกาะกัน
+    holder.LayoutOrder = 0
+    content.LayoutOrder = 1
+
+    -- ตัวช่วยสร้างปุ่ม/เลเบล
+    local api = {}
+
+    function api:NewButton(text, info, callback)
+        local btn = Instance.new("TextButton", content)
+        btn.AutoButtonColor = false
+        btn.Size = UDim2.new(1,0,0,30)
+        btn.BackgroundColor3 = THEME.BTN_IDLE
+        btn.Text = text or "Button"
+        btn.Font = Enum.Font.GothamSemibold
+        btn.TextSize = 14
+        btn.TextColor3 = THEME.TEXT_WHITE
+        corner(btn, 8); stroke(btn, 1, THEME.MINT, 0.20)
+
+        btn.MouseEnter:Connect(function() btn.BackgroundColor3 = THEME.BTN_HOVER end)
+        btn.MouseLeave:Connect(function() btn.BackgroundColor3 = THEME.BTN_IDLE end)
+        btn.MouseButton1Click:Connect(function()
+            pcall(callback or function() end)
+        end)
+        return btn
+    end
+
+    function api:NewLabel(text)
+        local l = Instance.new("TextLabel", content)
+        l.BackgroundTransparency = 1
+        l.Size = UDim2.new(1,0,0,24)
+        l.Font = Enum.Font.Gotham
+        l.TextSize = 14
+        l.TextXAlignment = Enum.TextXAlignment.Left
+        l.TextColor3 = THEME.TEXT_WHITE
+        l.Text = text or "Label"
+        function l:UpdateLabel(newText) l.Text = tostring(newText) end
+        return l
+    end
+
+    -- resize ให้ content มีความสูงพอดีกับลูก ๆ
+    local function syncHeight()
+        local total = 0
+        for _,o in ipairs(content:GetChildren()) do
+            if o:IsA("GuiObject") then total = total + o.AbsoluteSize.Y + 6 end
         end
+        content.Size = UDim2.new(1,0,0,total)
+    end
+    content.ChildAdded:Connect(syncHeight)
+    content.ChildRemoved:Connect(syncHeight)
+
+    return api
+end
+
+-- ---------- PUBLIC ----------
+function UFOPro.CreateLib(title)
+    if not CoreGui:FindFirstChild("UFO_HUB_X_UI") then buildUIMain() end
+    local gui = CoreGui:FindFirstChild("UFO_HUB_X_UI")
+    local win   = gui.Window
+    local left  = gui.Window.Body.Content.Columns.Left
+    local host  = gui.Window.Body.Content.Columns.Right:FindFirstChild("PageHost")
+
+    assert(win and left and host, "[UFOPro] UI containers not found")
+
+    -- ตั้งหัว
+    local label = win.Header:FindFirstChild("TitleCenter")
+    if label then
+        label.Text = string.format('<font color="#FFFFFF">%s</font> <font color="#00FF8C">HUB X</font>', title or "UFO")
     end
 
     local api = { _gui=gui, _win=win, _left=left, _host=host, _pages={}, _activeBtn=nil }
@@ -387,15 +465,17 @@ function UFOPro.CreateLib(title, theme)
         name = tostring(name or "Tab")
         local isFirst = (self._activeBtn == nil)
 
+        -- ปุ่มแท็บซ้าย + เพจขวา
         local btn = makeSideButton(self._left, name, isFirst)
         local page, scroll = makePage(self._host, name)
         self._pages[name] = {root=page, scroll=scroll, btn=btn}
 
+        -- สลับหน้า
         local function activate()
             for _,t in pairs(self._pages) do
                 t.root.Visible = false
                 t.btn.BackgroundColor3 = THEME.BTN_IDLE
-                t.btn.TextColor3 = Color3.fromRGB(180,190,200)
+                t.btn.TextColor3 = THEME.TEXT_DIM
             end
             page.Visible = true
             btn.BackgroundColor3 = THEME.BTN_ACTIVE
@@ -405,108 +485,25 @@ function UFOPro.CreateLib(title, theme)
         btn.MouseButton1Click:Connect(activate)
         if isFirst then activate() end
 
-        -- Section API
+        -- API ในแท็บ: Section
         local tabAPI = {}
-
         function tabAPI:NewSection(title)
-            title = tostring(title or "Section")
-            local holder = Instance.new("Frame", scroll)
-            holder.Size = UDim2.new(1,0,0,52)
-            holder.BackgroundColor3 = THEME.CARD_FILL
-            holder.BorderSizePixel = 0
-            corner(holder, 10); stroke(holder, 1, THEME.CARD_STROKE, 0.18)
-
-            -- header line
-            local inner = Instance.new("Frame", holder)
-            inner.BackgroundTransparency = 1
-            inner.Size = UDim2.new(1,-20,1,-14)
-            inner.Position = UDim2.new(0,10,0,7)
-
-            local h = Instance.new("UIListLayout", inner)
-            h.FillDirection = Enum.FillDirection.Horizontal
-            h.VerticalAlignment = Enum.VerticalAlignment.Center
-            h.Padding = UDim.new(0,10)
-
-            local dot = Instance.new("Frame", inner)
-            dot.Size = UDim2.fromOffset(8,8)
-            dot.BackgroundColor3 = Color3.fromRGB(86,168,255)
-            dot.BorderSizePixel = 0
-            corner(dot, 8)
-
-            local lab = Instance.new("TextLabel", inner)
-            lab.BackgroundTransparency = 1
-            lab.Size = UDim2.new(1, -28, 1, 0)
-            lab.Font = Enum.Font.GothamSemibold
-            lab.TextSize = 15
-            lab.TextXAlignment = Enum.TextXAlignment.Left
-            lab.TextColor3 = Color3.fromRGB(220,230,235)
-            lab.RichText = true
-            lab.Text = tostring(title)
-
-            -- ====== Section API ======
-            local secAPI = {}
-
-            function secAPI:UpdateSection(newTitle)
-                lab.Text = tostring(newTitle or title)
-            end
-
-            function secAPI:NewLabel(text)
-                local k = Instance.new("TextLabel", holder)
-                k.BackgroundColor3 = THEME.BTN_IDLE
-                k.TextColor3 = Color3.fromRGB(208,220,215)
-                k.Text = tostring(text or "Label")
-                k.Font = Enum.Font.Gotham
-                k.TextSize = 14
-                k.Size = UDim2.new(1,-20,0,30)
-                k.Position = UDim2.new(0,10,0,holder.AbsoluteSize.Y + 8)
-                k.TextXAlignment = Enum.TextXAlignment.Center
-                corner(k,8)
-                stroke(k,1,THEME.MINT,0.18)
-
-                return {
-                    UpdateLabel = function(_, newText)
-                        k.Text = tostring(newText or "")
-                    end
-                }
-            end
-
-            function secAPI:NewButton(text, info, callback)
-                local b = Instance.new("TextButton", holder)
-                b.AutoButtonColor = false
-                b.BackgroundColor3 = THEME.BTN_IDLE
-                b.TextColor3 = Color3.fromRGB(232,242,238)
-                b.Text = tostring(text or "Button")
-                b.Font = Enum.Font.GothamSemibold
-                b.TextSize = 14
-                b.Size = UDim2.new(1,-20,0,30)
-                b.Position = UDim2.new(0,10,0,holder.AbsoluteSize.Y + 8)
-                corner(b,10)
-                stroke(b,1,THEME.MINT,0.22)
-
-                b.MouseEnter:Connect(function()
-                    b.BackgroundColor3 = THEME.BTN_HOVER
-                end)
-                b.MouseLeave:Connect(function()
-                    b.BackgroundColor3 = THEME.BTN_IDLE
-                end)
-                b.MouseButton1Click:Connect(function()
-                    if typeof(callback) == "function" then
-                        pcall(callback)
-                    end
-                end)
-
-                return {
-                    UpdateButton = function(_, newText)
-                        b.Text = tostring(newText or "")
-                    end
-                }
-            end
-
-            return secAPI
-        end -- /NewSection
-
+            return makeSectionCard(scroll, title or "Section")
+        end
         return tabAPI
-    end -- /NewTab
+    end
 
     return api
-end -- /CreateLib
+end
+
+--======================================================
+-- DEMO: ทำให้เห็นปุ่มขึ้นทันที (ลบส่วนนี้ได้ถ้าไม่ต้องการ)
+--======================================================
+local UI = UFOPro.CreateLib("UFO")
+local mainTab = UI:NewTab("Main")
+local sec = mainTab:NewSection("Actions")
+sec:NewLabel("Status: Ready")
+sec:NewButton("Say Hello", "Print to console", function() print("[UFO HUB X] Hello!") end)
+sec:NewButton("Toggle UI (RightShift)", "Show/Hide", function() UI:ToggleUI() end)
+
+print("[UFO HUB X UI Pro] Loaded OK.")
