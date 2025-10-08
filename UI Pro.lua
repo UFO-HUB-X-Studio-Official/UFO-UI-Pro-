@@ -317,77 +317,120 @@ do
         end)
     end
 end
--- ========= ADD: Left button (player) + Active badge on Right =========
+-- ================= FIX & ADD: scroll L/R + show button + active badge ==============
 
--- ช่วยเช็ก container
-local function _getContainers()
-    local gui   = game:GetService("CoreGui"):FindFirstChild("UFO_HUB_X_UI")
-    local win   = gui and gui:FindFirstChild("Window")
-    local body  = win and win:FindFirstChild("Body")
-    local cont  = body and body:FindFirstChild("Content")
-    local cols  = cont and cont:FindFirstChild("Columns")
-    local Left  = cols and cols:FindFirstChild("Left")
-    local Right = cols and cols:FindFirstChild("Right")
-    return Left, Right
+local CoreGui = game:GetService("CoreGui")
+local gui = CoreGui:FindFirstChild("UFO_HUB_X_UI")
+assert(gui and gui:FindFirstChild("Window"), "UI not built yet")
+
+local win   = gui.Window
+local cols  = win.Body.Content.Columns
+local Left  = cols.Left
+local Right = cols.Right
+
+-- 1) เอารูปพรีวิวออก/ดันไปข้างหลังกันบัง
+do
+    local imgL = Left:FindFirstChildOfClass("ImageLabel")
+    if imgL then imgL.Visible = false end
+    local imgR = Right:FindFirstChildOfClass("ImageLabel")
+    if imgR then imgR.Visible = false end
 end
 
--- ป้ายชื่อแอคทีฟ (ตรงตำแหน่งกล่องแดงในรูป)
--- ถ้าต้องขยับนิดหน่อย ปรับ 4 ตัวเลขนี้ได้ (ค่าเริ่มให้พอดีกับดีไซน์)
-local ACTIVE_X, ACTIVE_Y = 8, 8     -- ระยะห่างจากขอบในของฝั่ง Right
-local ACTIVE_W, ACTIVE_H = 130, 28  -- ขนาดป้ายชื่อ (กว้าง x สูง)
+-- 2) ทำ ScrollingFrame ให้ทั้งสองฝั่ง (เลื่อนลื่น ๆ)
+local function ensureScroller(panel, name, sbThickness)
+    local sf = panel:FindFirstChild(name)
+    if not sf then
+        sf = Instance.new("ScrollingFrame", panel)
+        sf.Name = name
+        sf.BackgroundTransparency = 1
+        sf.BorderSizePixel = 0
+        sf.Position = UDim2.new(0,8,0,8)
+        sf.Size = UDim2.new(1,-16,1,-16)
+        sf.ScrollBarThickness = sbThickness or 3
+        sf.ClipsDescendants = true
+        sf.ZIndex = 5
+        local pad = Instance.new("UIPadding", sf)
+        pad.PaddingTop = UDim.new(0,0)
+        pad.PaddingLeft = UDim.new(0,0)
+        pad.PaddingRight = UDim.new(0,0)
+        pad.PaddingBottom = UDim.new(0,0)
+        local list = Instance.new("UIListLayout", sf)
+        list.Padding = UDim.new(0,8)
+        list.SortOrder = Enum.SortOrder.LayoutOrder
+        list:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            sf.CanvasSize = UDim2.new(0,0,0,list.AbsoluteContentSize.Y + 8)
+        end)
+    end
+    return sf
+end
 
-local function _ensureActiveBadge(Right)
+local LeftList  = ensureScroller(Left,  "LeftList",  3)
+local RightList = ensureScroller(Right, "RightList", 4)
+
+-- 3) ป้ายชื่อด้านขวา (จุดแดงในรูป) — แสดงไอคอน + ชื่อของปุ่มที่เลือก
+local function ensureActiveBadge()
     local badge = Right:FindFirstChild("ActiveBadge")
     if not badge then
         badge = Instance.new("Frame", Right)
         badge.Name = "ActiveBadge"
-        badge.Position = UDim2.new(0, ACTIVE_X, 0, ACTIVE_Y)
-        badge.Size = UDim2.new(0, ACTIVE_W, 0, ACTIVE_H)
-        badge.BackgroundColor3 = Color3.fromRGB(28,28,34) -- กลืนกับ UI
+        badge.Position = UDim2.new(0, 12, 0, 12)         -- ขยับได้ตามต้องการ
+        badge.Size     = UDim2.new(0, 140, 0, 28)        -- ขนาดป้าย
+        badge.BackgroundColor3 = Color3.fromRGB(28,28,34)
         badge.BorderSizePixel  = 0
-        corner(badge, 8)
-        stroke(badge, 1.2, GREEN, 0)
+        badge.ZIndex = 10
+        local function corner(gui, r) local c=Instance.new("UICorner",gui); c.CornerRadius=UDim.new(0,r or 8) end
+        corner(badge,8)
+        local s = Instance.new("UIStroke", badge); s.Color = GREEN; s.Thickness = 1.2
 
-        local ic = Instance.new("ImageLabel", badge)
-        ic.Name = "Icon"; ic.BackgroundTransparency = 1
-        ic.Size = UDim2.new(0, ACTIVE_H-8, 0, ACTIVE_H-8)
-        ic.Position = UDim2.new(0, 6, 0.5, -(ACTIVE_H-8)/2)
+        local icon = Instance.new("ImageLabel", badge)
+        icon.Name = "Icon"
+        icon.BackgroundTransparency = 1
+        icon.Size = UDim2.new(0, 20, 0, 20)
+        icon.Position = UDim2.new(0, 6, 0.5, -10)
+        icon.ZIndex = 11
 
         local txt = Instance.new("TextLabel", badge)
-        txt.Name = "Text"; txt.BackgroundTransparency = 1
-        txt.Position = UDim2.new(0, ACTIVE_H+10, 0, 0)
-        txt.Size = UDim2.new(1, -(ACTIVE_H+12), 1, 0)
+        txt.Name = "Text"
+        txt.BackgroundTransparency = 1
+        txt.Position = UDim2.new(0, 32, 0, 0)
+        txt.Size = UDim2.new(1, -36, 1, 0)
         txt.Font = Enum.Font.GothamSemibold
         txt.TextSize = 14
-        txt.TextXAlignment = Enum.TextXAlignment.Left
         txt.TextColor3 = TEXT_WHITE
+        txt.TextXAlignment = Enum.TextXAlignment.Left
+        txt.ZIndex = 11
     end
     return badge
 end
+local ActiveBadge = ensureActiveBadge()
 
--- ฟังก์ชันสร้างปุ่มสี่เหลี่ยมฝั่งซ้าย (เต็มความกว้าง, สูง 28px ตามรูป)
+-- 4) ฟังก์ชันสร้างปุ่มสี่เหลี่ยมขอบเขียวฝั่งซ้าย (ขนาดเท่าที่เห็นในรูป)
 local function CreateLeftButton(opts)
-    local Left, Right = _getContainers()
-    assert(Left and Right, "Containers not found")
+    opts = opts or {}
+    local name    = tostring(opts.name or "button")
+    local assetId = tostring(opts.assetId or "")
 
-    local H = 28  -- ความสูงปุ่มให้เท่ากับแถบสีขาวในรูป
-    local btn = Instance.new("TextButton", Left)
-    btn.Name = "Btn_"..tostring(opts.name or "btn")
+    local H = 28  -- ความสูงปุ่ม (เท่ากับแท่งสีขาวในรูป)
+    local btn = Instance.new("TextButton", LeftList)
+    btn.Name = "Btn_"..name
     btn.AutoButtonColor = false
     btn.Size = UDim2.new(1, 0, 0, H)
     btn.BackgroundColor3 = Color3.fromRGB(20,20,20)
     btn.BorderSizePixel = 0
-    btn.Text = "" -- เราจัด layout เอง
-    corner(btn, 8)
-    stroke(btn, 1.2, GREEN, 0)
+    btn.Text = ""
+    btn.ZIndex = 6
 
-    -- ไอคอนซ้าย (รองรับ asset id)
+    local c = Instance.new("UICorner", btn); c.CornerRadius = UDim.new(0,8)
+    local s = Instance.new("UIStroke", btn); s.Color = GREEN; s.Thickness = 1.2
+
+    -- ไอคอนซ้าย
     local iconSize = H - 8
     local ic = Instance.new("ImageLabel", btn)
     ic.BackgroundTransparency = 1
     ic.Size = UDim2.new(0, iconSize, 0, iconSize)
     ic.Position = UDim2.new(0, 6, 0.5, -iconSize/2)
-    ic.Image = ("rbxassetid://%s"):format(tostring(opts.assetId or ""))
+    ic.Image = ("rbxassetid://%s"):format(assetId)
+    ic.ZIndex = 7
 
     -- ข้อความ
     local lab = Instance.new("TextLabel", btn)
@@ -398,29 +441,27 @@ local function CreateLeftButton(opts)
     lab.TextSize = 14
     lab.TextXAlignment = Enum.TextXAlignment.Left
     lab.TextColor3 = TEXT_WHITE
-    lab.Text = tostring(opts.name or "button")
+    lab.Text = name
+    lab.ZIndex = 7
 
-    -- อัปเดตป้ายแดง (Active badge) ฝั่งขวา ทุกครั้งที่คลิก
-    local function updateActive()
-        local badge = _ensureActiveBadge(Right)
-        badge.Icon.Image = ic.Image
-        badge.Text.Text  = lab.Text
-        badge.Visible = true
-    end
-    btn.MouseButton1Click:Connect(updateActive)
-
-    -- แสดงค่าแรกทันที (ให้ขึ้นตรงจุดสีแดงตั้งแต่แรก)
-    updateActive()
-
-    -- hover เล็กน้อย
+    -- โฮเวอร์
     btn.MouseEnter:Connect(function() btn.BackgroundColor3 = Color3.fromRGB(26,26,26) end)
     btn.MouseLeave:Connect(function() btn.BackgroundColor3 = Color3.fromRGB(20,20,20) end)
 
-    return btn
+    -- อัปเดตป้ายชื่อด้านขวาเมื่อคลิก
+    local function updateBadge()
+        ActiveBadge.Icon.Image = ic.Image
+        ActiveBadge.Text.Text  = name
+        ActiveBadge.Visible = true
+    end
+    btn.MouseButton1Click:Connect(updateBadge)
+
+    return btn, updateBadge
 end
 
--- === สร้างปุ่มตามที่ขอ ===
-CreateLeftButton({
-    name    = "Player",
-    assetId = 116976545042904,  -- รูปจาก Roblox
+-- 5) สร้างปุ่มที่ต้องการ + ให้ขึ้นป้ายชื่อด้านขวาทันที
+local btn, showNow = CreateLeftButton({
+    name = "player",
+    assetId = 116976545042904,
 })
+showNow()
