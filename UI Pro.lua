@@ -317,3 +317,110 @@ do
         end)
     end
 end
+-- ========= ADD: Left button (player) + Active badge on Right =========
+
+-- ช่วยเช็ก container
+local function _getContainers()
+    local gui   = game:GetService("CoreGui"):FindFirstChild("UFO_HUB_X_UI")
+    local win   = gui and gui:FindFirstChild("Window")
+    local body  = win and win:FindFirstChild("Body")
+    local cont  = body and body:FindFirstChild("Content")
+    local cols  = cont and cont:FindFirstChild("Columns")
+    local Left  = cols and cols:FindFirstChild("Left")
+    local Right = cols and cols:FindFirstChild("Right")
+    return Left, Right
+end
+
+-- ป้ายชื่อแอคทีฟ (ตรงตำแหน่งกล่องแดงในรูป)
+-- ถ้าต้องขยับนิดหน่อย ปรับ 4 ตัวเลขนี้ได้ (ค่าเริ่มให้พอดีกับดีไซน์)
+local ACTIVE_X, ACTIVE_Y = 8, 8     -- ระยะห่างจากขอบในของฝั่ง Right
+local ACTIVE_W, ACTIVE_H = 130, 28  -- ขนาดป้ายชื่อ (กว้าง x สูง)
+
+local function _ensureActiveBadge(Right)
+    local badge = Right:FindFirstChild("ActiveBadge")
+    if not badge then
+        badge = Instance.new("Frame", Right)
+        badge.Name = "ActiveBadge"
+        badge.Position = UDim2.new(0, ACTIVE_X, 0, ACTIVE_Y)
+        badge.Size = UDim2.new(0, ACTIVE_W, 0, ACTIVE_H)
+        badge.BackgroundColor3 = Color3.fromRGB(28,28,34) -- กลืนกับ UI
+        badge.BorderSizePixel  = 0
+        corner(badge, 8)
+        stroke(badge, 1.2, GREEN, 0)
+
+        local ic = Instance.new("ImageLabel", badge)
+        ic.Name = "Icon"; ic.BackgroundTransparency = 1
+        ic.Size = UDim2.new(0, ACTIVE_H-8, 0, ACTIVE_H-8)
+        ic.Position = UDim2.new(0, 6, 0.5, -(ACTIVE_H-8)/2)
+
+        local txt = Instance.new("TextLabel", badge)
+        txt.Name = "Text"; txt.BackgroundTransparency = 1
+        txt.Position = UDim2.new(0, ACTIVE_H+10, 0, 0)
+        txt.Size = UDim2.new(1, -(ACTIVE_H+12), 1, 0)
+        txt.Font = Enum.Font.GothamSemibold
+        txt.TextSize = 14
+        txt.TextXAlignment = Enum.TextXAlignment.Left
+        txt.TextColor3 = TEXT_WHITE
+    end
+    return badge
+end
+
+-- ฟังก์ชันสร้างปุ่มสี่เหลี่ยมฝั่งซ้าย (เต็มความกว้าง, สูง 28px ตามรูป)
+local function CreateLeftButton(opts)
+    local Left, Right = _getContainers()
+    assert(Left and Right, "Containers not found")
+
+    local H = 28  -- ความสูงปุ่มให้เท่ากับแถบสีขาวในรูป
+    local btn = Instance.new("TextButton", Left)
+    btn.Name = "Btn_"..tostring(opts.name or "btn")
+    btn.AutoButtonColor = false
+    btn.Size = UDim2.new(1, 0, 0, H)
+    btn.BackgroundColor3 = Color3.fromRGB(20,20,20)
+    btn.BorderSizePixel = 0
+    btn.Text = "" -- เราจัด layout เอง
+    corner(btn, 8)
+    stroke(btn, 1.2, GREEN, 0)
+
+    -- ไอคอนซ้าย (รองรับ asset id)
+    local iconSize = H - 8
+    local ic = Instance.new("ImageLabel", btn)
+    ic.BackgroundTransparency = 1
+    ic.Size = UDim2.new(0, iconSize, 0, iconSize)
+    ic.Position = UDim2.new(0, 6, 0.5, -iconSize/2)
+    ic.Image = ("rbxassetid://%s"):format(tostring(opts.assetId or ""))
+
+    -- ข้อความ
+    local lab = Instance.new("TextLabel", btn)
+    lab.BackgroundTransparency = 1
+    lab.Position = UDim2.new(0, iconSize + 12, 0, 0)
+    lab.Size = UDim2.new(1, -(iconSize + 14), 1, 0)
+    lab.Font = Enum.Font.GothamSemibold
+    lab.TextSize = 14
+    lab.TextXAlignment = Enum.TextXAlignment.Left
+    lab.TextColor3 = TEXT_WHITE
+    lab.Text = tostring(opts.name or "button")
+
+    -- อัปเดตป้ายแดง (Active badge) ฝั่งขวา ทุกครั้งที่คลิก
+    local function updateActive()
+        local badge = _ensureActiveBadge(Right)
+        badge.Icon.Image = ic.Image
+        badge.Text.Text  = lab.Text
+        badge.Visible = true
+    end
+    btn.MouseButton1Click:Connect(updateActive)
+
+    -- แสดงค่าแรกทันที (ให้ขึ้นตรงจุดสีแดงตั้งแต่แรก)
+    updateActive()
+
+    -- hover เล็กน้อย
+    btn.MouseEnter:Connect(function() btn.BackgroundColor3 = Color3.fromRGB(26,26,26) end)
+    btn.MouseLeave:Connect(function() btn.BackgroundColor3 = Color3.fromRGB(20,20,20) end)
+
+    return btn
+end
+
+-- === สร้างปุ่มตามที่ขอ ===
+CreateLeftButton({
+    name    = "Player",
+    assetId = 116976545042904,  -- รูปจาก Roblox
+})
