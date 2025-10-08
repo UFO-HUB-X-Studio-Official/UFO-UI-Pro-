@@ -451,3 +451,135 @@ do
     ToggleBtn.MouseButton1Click:Connect(toggle)
     UIS.InputBegan:Connect(function(i,gp) if not gp and i.KeyCode==Enum.KeyCode.RightShift then toggle() end end)
 end
+-- ====== สร้างปุ่มที่ขอ: player + รูป ======
+CreateLeftButton("player", 116976545042904)
+-- แสดงชื่อ/รูปทันทีเหมือนกดแล้ว
+do
+    ABIcon.Image = "rbxassetid://116976545042904"
+    ABText.Text  = "player"
+    ActiveBadge.Visible = true
+end
+
+-- ปุ่ม Toggle (RightShift)
+do
+    local ToggleGui = Instance.new("ScreenGui", CoreGui)
+    ToggleGui.Name = "UFO_HUB_X_Toggle"; ToggleGui.IgnoreGuiInset = true
+    local ToggleBtn = Instance.new("ImageButton", ToggleGui)
+    ToggleBtn.Size = UDim2.fromOffset(64,64); ToggleBtn.Position = UDim2.fromOffset(80,200)
+    ToggleBtn.BackgroundColor3 = Color3.new(0,0,0); ToggleBtn.BorderSizePixel = 0; ToggleBtn.Image = IMG_TOGGLE
+    local c = Instance.new("UICorner", ToggleBtn); c.CornerRadius = UDim.new(0,8)
+    local s = Instance.new("UIStroke", ToggleBtn); s.Thickness=2; s.Color=GREEN
+    local function toggle() Window.Visible = not Window.Visible end
+    ToggleBtn.MouseButton1Click:Connect(toggle)
+    UIS.InputBegan:Connect(function(i,gp) if not gp and i.KeyCode==Enum.KeyCode.RightShift then toggle() end end)
+end
+-- ====== สร้างปุ่มที่ขอ: player + รูป ======
+CreateLeftButton("player", 116976545042904)
+-- แสดงชื่อ/รูปทันทีเหมือนกดแล้ว
+do
+    ABIcon.Image = "rbxassetid://116976545042904"
+    ABText.Text  = "player"
+    ActiveBadge.Visible = true
+end
+
+-- ปุ่ม Toggle (RightShift)
+do
+    local ToggleGui = Instance.new("ScreenGui", CoreGui)
+    ToggleGui.Name = "UFO_HUB_X_Toggle"; ToggleGui.IgnoreGuiInset = true
+    local ToggleBtn = Instance.new("ImageButton", ToggleGui)
+    ToggleBtn.Size = UDim2.fromOffset(64,64); ToggleBtn.Position = UDim2.fromOffset(80,200)
+    ToggleBtn.BackgroundColor3 = Color3.new(0,0,0); ToggleBtn.BorderSizePixel = 0; ToggleBtn.Image = IMG_TOGGLE
+    local c = Instance.new("UICorner", ToggleBtn); c.CornerRadius = UDim.new(0,8)
+    local s = Instance.new("UIStroke", ToggleBtn); s.Thickness=2; s.Color=GREEN
+    local function toggle() Window.Visible = not Window.Visible end
+    ToggleBtn.MouseButton1Click:Connect(toggle)
+    UIS.InputBegan:Connect(function(i,gp) if not gp and i.KeyCode==Enum.KeyCode.RightShift then toggle() end end)
+end
+-- ====== สร้างปุ่มที่ขอ: player + รูป ======
+CreateLeftButton("player", 116976545042904)
+-- แสดงชื่อ/รูปทันทีเหมือนกดแล้ว
+do
+    ABIcon.Image = "rbxassetid://116976545042904"
+    ABText.Text  = "player"
+    ActiveBadge.Visible = true
+end
+
+-- ปุ่ม Toggle (RightShift)
+do
+    local ToggleGui = Instance.new("ScreenGui", CoreGui)
+    ToggleGui.Name = "UFO_HUB_X_Toggle"; ToggleGui.IgnoreGuiInset = true
+    local ToggleBtn = Instance.new("ImageButton", ToggleGui)
+    ToggleBtn.Size = UDim2.fromOffset(64,64); ToggleBtn.Position = UDim2.fromOffset(80,200)
+    ToggleBtn.BackgroundColor3 = Color3.new(0,0,0); ToggleBtn.BorderSizePixel = 0; ToggleBtn.Image = IMG_TOGGLE
+    local c = Instance.new("UICorner", ToggleBtn); c.CornerRadius = UDim.new(0,8)
+    local s = Instance.new("UIStroke", ToggleBtn); s.Thickness=2; s.Color=GREEN
+    local function toggle() Window.Visible = not Window.Visible end
+    ToggleBtn.MouseButton1Click:Connect(toggle)
+    UIS.InputBegan:Connect(function(i,gp) if not gp and i.KeyCode==Enum.KeyCode.RightShift then toggle() end end)
+end
+-- ====== สร้างปุ่มที่ขอ: player + รูป ======
+CreateLeftButton("player", 116976545042904)
+-- แสดงชื่อ/รูปทันทีเหมือนกดแล้ว
+do
+    ABIcon.Image = "rbxassetid://116976545042904"
+    ABText.Text  = "player"
+    ActiveBadge.Visible = true
+end
+
+-- ปุ่ม Toggle (RightShift)
+do
+    local ToggleGui = Instance.new("ScreenGui", CoreGui)
+    ToggleGui.Name = "UFO_HUB_X_Toggle"; ToggleGui.IgnoreGuiInset = true
+    local ToggleBtn = Instance.new("ImageButton", ToggleGui)
+    ToggleBtn.Size = UDim2.fromOffset(64,64); ToggleBtn.Position = UDim2.fromOffset(80,200)
+    ToggleBtn.BackgroundColor3 = Color3.new(0,0,0); ToggleBtn.BorderSizePixel = 0; ToggleBtn.Image = IMG_TOGGLE
+    local c = Instance.new("UICorner", ToggleBtn); c.CornerRadius = UDim.new(0,8)
+    local s = Instance.new("UIStroke", ToggleBtn); s.Thickness=2; s.Color=GREEN
+    local function toggle() Window.Visible = not Window.Visible end
+    ToggleBtn.MouseButton1Click:Connect(toggle)
+    UIS.InputBegan:Connect(function(i,gp) if not gp and i.KeyCode==Enum.KeyCode.RightShift then toggle() end end)
+end
+-- ====== สร้างปุ่มที่ขอ: player + รูป ======
+CreateLeftButton("player", 116976545042904)
+-- แสดงชื่อ/รูปทันทีเหมือนกดแล้ว
+do
+    ABIcon.Image = "rbxassetid://116976545042904"
+    ABText.Text  = "player"
+    ActiveBadge.Visible = true
+end
+
+-- ปุ่ม Toggle (RightShift)
+do
+    local ToggleGui = Instance.new("ScreenGui", CoreGui)
+    ToggleGui.Name = "UFO_HUB_X_Toggle"; ToggleGui.IgnoreGuiInset = true
+    local ToggleBtn = Instance.new("ImageButton", ToggleGui)
+    ToggleBtn.Size = UDim2.fromOffset(64,64); ToggleBtn.Position = UDim2.fromOffset(80,200)
+    ToggleBtn.BackgroundColor3 = Color3.new(0,0,0); ToggleBtn.BorderSizePixel = 0; ToggleBtn.Image = IMG_TOGGLE
+    local c = Instance.new("UICorner", ToggleBtn); c.CornerRadius = UDim.new(0,8)
+    local s = Instance.new("UIStroke", ToggleBtn); s.Thickness=2; s.Color=GREEN
+    local function toggle() Window.Visible = not Window.Visible end
+    ToggleBtn.MouseButton1Click:Connect(toggle)
+    UIS.InputBegan:Connect(function(i,gp) if not gp and i.KeyCode==Enum.KeyCode.RightShift then toggle() end end)
+end
+-- ====== สร้างปุ่มที่ขอ: player + รูป ======
+CreateLeftButton("player", 116976545042904)
+-- แสดงชื่อ/รูปทันทีเหมือนกดแล้ว
+do
+    ABIcon.Image = "rbxassetid://116976545042904"
+    ABText.Text  = "player"
+    ActiveBadge.Visible = true
+end
+
+-- ปุ่ม Toggle (RightShift)
+do
+    local ToggleGui = Instance.new("ScreenGui", CoreGui)
+    ToggleGui.Name = "UFO_HUB_X_Toggle"; ToggleGui.IgnoreGuiInset = true
+    local ToggleBtn = Instance.new("ImageButton", ToggleGui)
+    ToggleBtn.Size = UDim2.fromOffset(64,64); ToggleBtn.Position = UDim2.fromOffset(80,200)
+    ToggleBtn.BackgroundColor3 = Color3.new(0,0,0); ToggleBtn.BorderSizePixel = 0; ToggleBtn.Image = IMG_TOGGLE
+    local c = Instance.new("UICorner", ToggleBtn); c.CornerRadius = UDim.new(0,8)
+    local s = Instance.new("UIStroke", ToggleBtn); s.Thickness=2; s.Color=GREEN
+    local function toggle() Window.Visible = not Window.Visible end
+    ToggleBtn.MouseButton1Click:Connect(toggle)
+    UIS.InputBegan:Connect(function(i,gp) if not gp and i.KeyCode==Enum.KeyCode.RightShift then toggle() end end)
+end
