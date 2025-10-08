@@ -174,18 +174,6 @@ RL:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     RightList.CanvasSize=UDim2.new(0,0,0,RL.AbsoluteContentSize.Y+8)
 end)
 
--- ===== เพิ่ม: ซ่อนสกอร์บาร์แนวตั้ง (เอาเส้นสีขาวออก) แต่ยังเลื่อนได้ปกติ =====
-local function hideScrollbar(sf)
-    sf.ScrollBarThickness = 0
-    sf.ScrollBarImageTransparency = 1
-    sf.MidImage, sf.TopImage, sf.BottomImage = "", "", ""
-    sf.ScrollBarInset = Enum.ScrollBarInset.None
-    sf.ScrollingDirection = Enum.ScrollingDirection.Y
-end
-hideScrollbar(LeftList)
-hideScrollbar(RightList)
--- ========================================================================
-
 -- ป้ายชื่อ (มุมซ้ายบนแผงขวา) แสดงไอคอน+ชื่อปุ่มที่เลือก
 local ActiveBadge = Instance.new("Frame", Right)
 ActiveBadge.Name="ActiveBadge"; ActiveBadge.Position=UDim2.new(0,14,0,12); ActiveBadge.Size=UDim2.new(0,150,0,28)
