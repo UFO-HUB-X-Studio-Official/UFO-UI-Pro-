@@ -317,21 +317,3 @@ do
         end)
     end
 end
-
---[[ ================= HOW TO USE (ทดสอบสกรอลล์) =================
--- ซ้าย: เพิ่มปุ่ม/เฟรมทดสอบเยอะ ๆ เพื่อดูว่าเลื่อนลื่น
-for i=1,25 do
-    local test = Instance.new("TextLabel", Left)
-    test.Size = UDim2.new(1,0,0,26); test.BackgroundTransparency=1
-    test.Text = "Left item "..i; test.Font=Enum.Font.Gotham; test.TextSize=14; test.TextColor3 = TEXT_WHITE
-    test.TextXAlignment = Enum.TextXAlignment.Left
-end
-
--- ขวา: เพิ่มกล่องย่อยเยอะ ๆ
-for i=1,18 do
-    local card = Instance.new("Frame", PageHost)
-    card.Size = UDim2.new(1,0,0,44); card.BackgroundColor3 = Color3.fromRGB(28,28,34)
-    card.BorderSizePixel=0; corner(card,10); stroke(card,1,Color3.fromRGB(100,160,140),0.18)
-end
--- เลื่อนทั้งสองฝั่งได้แน่นอน
---================================================================ ]]
