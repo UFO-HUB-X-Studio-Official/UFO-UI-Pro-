@@ -223,7 +223,7 @@ local function CreateLeftButton(name, assetId)
     ic.BackgroundTransparency = 1
     ic.Size = UDim2.new(0, iconSize, 0, iconSize)
     ic.Position = UDim2.new(0, 6, 0.5, -iconSize / 2)
-    ic.Image = "rbxassetid://" .. tostring(assetId)
+    ic.Image = "rbxassetid://117052960049460" .. tostring(assetId)
 
     local lab = Instance.new("TextLabel", btn)
     lab.BackgroundTransparency = 1
