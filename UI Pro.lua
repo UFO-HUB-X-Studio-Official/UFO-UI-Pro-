@@ -176,18 +176,30 @@ RL:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     RightList.CanvasSize=UDim2.new(0,0,0,RL.AbsoluteContentSize.Y+8)
 end)
 
--- ===== โลโก้หลักเป็น "พื้นหลัง" ของพาเนลขวา (อยู่ตลอด ไม่ถูกซ่อน) =====
-RightList.ZIndex = 2 -- รายการอยู่เหนือโลโก้
+-- ===== Main logo เป็นพื้นหลัง ติดกับพาเนลขวา (ไม่เลื่อนตามสกรอลล์) =====
+-- ต้องวางไว้หลังสร้าง RightList เสร็จ และก่อน ActiveBadge
+RightList.BackgroundTransparency = 1          -- ให้รายการโปร่งเพื่อเห็นโลโก้ด้านหลัง
+RightList.ZIndex = 1                          -- รายการอยู่เหนือโลโก้
+
+-- ถ้ามี MainLogo เดิมอยู่ใน RightList ให้ลบทิ้งก่อน (กันซ้ำ)
+do
+    local old1 = RightList:FindFirstChild("MainLogo")
+    local old2 = Right:FindFirstChild("MainLogo")
+    if old1 then old1:Destroy() end
+    if old2 then old2:Destroy() end
+end
+
 local MainLogo = Instance.new("ImageLabel")
 MainLogo.Name = "MainLogo"
 MainLogo.BackgroundTransparency = 1
 MainLogo.AnchorPoint = Vector2.new(0.5, 0.5)
 MainLogo.Position = UDim2.new(0.5, 0, 0.5, 0)
 MainLogo.Size = UDim2.new(0, 260, 0, 260)
-MainLogo.Image = "rbxassetid://116415093042583"
+MainLogo.Image = "rbxassetid://117052960049460"  -- <<< ID ที่ต้องการให้แสดง
 MainLogo.ScaleType = Enum.ScaleType.Fit
-MainLogo.ZIndex = 0           -- ต่ำกว่าเนื้อหา
-MainLogo.Parent = Right       -- เป็นลูกของ Right เพื่อให้เป็นส่วนเดียวกับพื้นดำ
+MainLogo.ImageTransparency = 0                  -- ถ้าอยากจาง ๆ ใส่ 0.08 ประมาณนี้ได้
+MainLogo.ZIndex = 0                             -- ต่ำกว่า RightList เพื่อเป็นพื้นหลัง
+MainLogo.Parent = Right                         -- สำคัญ! ต้องเป็นลูกของ Right (ไม่ใช่ RightList)
 
 -- ป้ายชื่อ (มุมซ้ายบนแผงขวา)
 local ActiveBadge = Instance.new("Frame", Right)
