@@ -324,10 +324,10 @@ local function CreateLeftButton(name, assetId)
 end
 
 -- ====== สร้างปุ่มที่ขอ: player + รูป ======
-CreateLeftButton("player", 116976545042904)
+CreateLeftButton("Player", 116976545042904)
 -- แสดงชื่อ/รูปทันทีเหมือนกดแล้ว
 do
     ABIcon.Image = "rbxassetid://116976545042904"
-    ABText.Text  = "player"
+    ABText.Text  = "Player"
     ActiveBadge.Visible = true
 end
