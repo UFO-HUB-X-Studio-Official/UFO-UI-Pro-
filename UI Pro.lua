@@ -174,6 +174,18 @@ RL:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     RightList.CanvasSize=UDim2.new(0,0,0,RL.AbsoluteContentSize.Y+8)
 end)
 
+-- รูปหลักเริ่มต้นในหน้าหลัก (Right Panel)
+local MainLogo = Instance.new("ImageLabel", RightList)
+MainLogo.Name = "MainLogo"
+MainLogo.BackgroundTransparency = 1
+MainLogo.AnchorPoint = Vector2.new(0.5, 0.5)
+MainLogo.Position = UDim2.new(0.5, 0, 0.5, 0)
+MainLogo.Size = UDim2.new(0, 240, 0, 240)
+MainLogo.Image = "rbxassetid://116415093042583" -- ใช้รูปเอเลี่ยน UFO HUB X ที่เคยใช้
+MainLogo.ImageColor3 = Color3.fromRGB(255, 255, 255)
+MainLogo.ScaleType = Enum.ScaleType.Fit
+MainLogo.ZIndex = 2
+
 -- ป้ายชื่อ (มุมซ้ายบนแผงขวา) แสดงไอคอน+ชื่อปุ่มที่เลือก
 local ActiveBadge = Instance.new("Frame", Right)
 ActiveBadge.Name="ActiveBadge"; ActiveBadge.Position=UDim2.new(0,14,0,12); ActiveBadge.Size=UDim2.new(0,150,0,28)
@@ -300,6 +312,7 @@ hideScrollbar(RightList)
 -- ========================================================================
 -- ปุ่มซ้าย: ขอบเขียว + เอฟเฟกต์กดค้าง + สลับ active ถูกต้อง + เริ่มต้นไม่ active
 -- ========================================================================
+if MainLogo then MainLogo.Visible = false end
 local activeButton = nil
 local LeftButtons = {}
 
