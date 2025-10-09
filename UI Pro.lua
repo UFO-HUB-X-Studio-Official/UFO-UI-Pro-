@@ -159,32 +159,57 @@ LL:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     LeftList.CanvasSize=UDim2.new(0,0,0,LL.AbsoluteContentSize.Y+8)
 end)
 
--- RIGHT panel container + สกรอลล์ภายใน
+-- RIGHT panel container + สกรอลล์ภายใน (เวอร์ชันรวมโลโก้เป็นพื้นหลัง)
 local Right = Instance.new("Frame", Columns)
 Right.BackgroundColor3 = Color3.fromRGB(16,16,16)
 Right.Position = UDim2.new(LEFT_RATIO, GAP_BETWEEN, 0, 0)
 Right.Size = UDim2.new(RIGHT_RATIO, -GAP_BETWEEN/2, 1, 0)
-Right.ClipsDescendants = true; corner(Right, 10); stroke(Right, 1.2, GREEN, 0); stroke(Right, 0.45, MINT, 0.35)
+Right.ClipsDescendants = true
+corner(Right, 10)
+stroke(Right, 1.2, GREEN, 0)
+stroke(Right, 0.45, MINT, 0.35)
 
-local RightList = Instance.new("ScrollingFrame", Right)
-RightList.Name="RightList"; RightList.BackgroundTransparency=1; RightList.BorderSizePixel=0
-RightList.Position=UDim2.new(0,8,0,8); RightList.Size=UDim2.new(1,-16,1,-16); RightList.ScrollBarThickness=4
-local RL=Instance.new("UIListLayout", RightList); RL.Padding=UDim.new(0,8); RL.SortOrder=Enum.SortOrder.LayoutOrder
-RL:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    RightList.CanvasSize=UDim2.new(0,0,0,RL.AbsoluteContentSize.Y+8)
-end)
+-- ----- MainLogo = ส่วนเดียวกับพาเนลขวา (ไม่เลื่อนตามสกรอลล์) -----
+-- ถ้ามี MainLogo เดิมอยู่ใน Right หรือ RightList ให้ลบทิ้งก่อน กันซ้ำ
+do
+    local old1 = Right:FindFirstChild("MainLogo")
+    local old2 = Right:FindFirstChild("MainLogo")
+    if old1 then old1:Destroy() end
+    if old2 then old2:Destroy() end
+end
 
--- รูปหลักเริ่มต้นในหน้าหลัก (Right Panel)
-local MainLogo = Instance.new("ImageLabel", RightList)
+local MainLogo = Instance.new("ImageLabel")
 MainLogo.Name = "MainLogo"
 MainLogo.BackgroundTransparency = 1
 MainLogo.AnchorPoint = Vector2.new(0.5, 0.5)
 MainLogo.Position = UDim2.new(0.5, 0, 0.5, 0)
-MainLogo.Size = UDim2.new(0, 240, 0, 240)
-MainLogo.Image = "rbxassetid://116415093042583" -- ใช้รูปเอเลี่ยน UFO HUB X ที่เคยใช้
-MainLogo.ImageColor3 = Color3.fromRGB(255, 255, 255)
+-- ให้ดูกลืนกับพื้นหลัง: เว้นขอบนิดหน่อยให้ไม่ทับเส้นขอบเขียว
+MainLogo.Size = UDim2.new(1, -48, 1, -48)           -- เต็มพาเนลขวาเกือบทั้งหมด
+MainLogo.Image = "rbxassetid://117052960049460"     -- << รูปเอเลี่ยนที่ต้องการ
 MainLogo.ScaleType = Enum.ScaleType.Fit
-MainLogo.ZIndex = 2
+MainLogo.ImageTransparency = 0                       -- ถ้าอยากจาง ๆ ใช้ 0.08 ได้
+MainLogo.ZIndex = 0                                  -- เป็นพื้นหลัง
+MainLogo.Parent = Right                              -- สำคัญ! เป็นลูกของ Right
+
+-- ----- RightList = รายการที่เลื่อนทับโลโก้ (เลื่อนได้ตามเดิม) -----
+local RightList = Instance.new("ScrollingFrame", Right)
+RightList.Name = "RightList"
+RightList.BackgroundTransparency = 1                 -- โปร่งใสเพื่อเห็นโลโก้ด้านหลัง
+RightList.BorderSizePixel = 0
+RightList.Position = UDim2.new(0,8,0,8)
+RightList.Size = UDim2.new(1,-16,1,-16)
+RightList.ZIndex = 1                                  -- อยู่เหนือ MainLogo
+-- ซ่อนสกรอลบาร์ แต่ยังเลื่อนได้ปกติ
+RightList.ScrollBarThickness = 0
+RightList.ScrollBarImageTransparency = 1
+RightList.TopImage, RightList.MidImage, RightList.BottomImage = "","",""
+
+local RL = Instance.new("UIListLayout", RightList)
+RL.Padding = UDim.new(0,8)
+RL.SortOrder = Enum.SortOrder.LayoutOrder
+RL:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    RightList.CanvasSize = UDim2.new(0,0,0, RL.AbsoluteContentSize.Y + 8)
+end)
 
 -- ป้ายชื่อ (มุมซ้ายบนแผงขวา) แสดงไอคอน+ชื่อปุ่มที่เลือก
 local ActiveBadge = Instance.new("Frame", Right)
