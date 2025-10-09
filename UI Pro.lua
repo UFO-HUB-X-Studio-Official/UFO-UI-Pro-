@@ -182,42 +182,6 @@ local abStroke=Instance.new("UIStroke", ActiveBadge); abStroke.Color = GREEN; ab
 local ABIcon=Instance.new("ImageLabel",ActiveBadge); ABIcon.Name="Icon"; ABIcon.BackgroundTransparency=1; ABIcon.Size=UDim2.new(0,20,0,20); ABIcon.Position=UDim2.new(0,6,0.5,-10)
 local ABText=Instance.new("TextLabel",ActiveBadge); ABText.Name="Text"; ABText.BackgroundTransparency=1; ABText.Position=UDim2.new(0,32,0,0); ABText.Size=UDim2.new(1,-36,1,0)
 ABText.Font=Enum.Font.GothamSemibold; ABText.TextSize=14; ABText.TextColor3=TEXT_WHITE; ABText.TextXAlignment=Enum.TextXAlignment.Left
-
--- ฟังก์ชันสร้างปุ่มสี่เหลี่ยมขอบเขียว (ซ้าย) + อัปเดตป้ายชื่อ
-local function CreateLeftButton(name, assetId)
-    local H=28 -- ความสูงตามแท่งสีขาวในรูป
-    local btn=Instance.new("TextButton", LeftList)
-    btn.Name="Btn_"..name; btn.AutoButtonColor=false; btn.Size=UDim2.new(1,0,0,H)
-    btn.BackgroundColor3=Color3.fromRGB(20,20,20); btn.Text=""; btn.BorderSizePixel=0
-    corner(btn,8); local s=Instance.new("UIStroke",btn); s.Color=GREEN; s.Thickness=1.2
-
-    local iconSize=H-8
-    local ic=Instance.new("ImageLabel",btn); ic.BackgroundTransparency=1; ic.Size=UDim2.new(0,iconSize,0,iconSize); ic.Position=UDim2.new(0,6,0.5,-iconSize/2)
-    ic.Image="rbxassetid://"..tostring(assetId)
-
-    local lab=Instance.new("TextLabel",btn); lab.BackgroundTransparency=1; lab.Position=UDim2.new(0,iconSize+12,0,0); lab.Size=UDim2.new(1,-(iconSize+14),1,0)
-    lab.Font=Enum.Font.GothamSemibold; lab.TextSize=14; lab.TextColor3=TEXT_WHITE; lab.TextXAlignment=Enum.TextXAlignment.Left; lab.Text=name
-
-    btn.MouseEnter:Connect(function() btn.BackgroundColor3=Color3.fromRGB(26,26,26) end)
-    btn.MouseLeave:Connect(function() btn.BackgroundColor3=Color3.fromRGB(20,20,20) end)
-    btn.MouseButton1Click:Connect(function()
-        ABIcon.Image = ic.Image
-        ABText.Text  = name
-        ActiveBadge.Visible = true
-    end)
-
-    return btn
-end
-
--- ====== สร้างปุ่มที่ขอ: player + รูป ======
-CreateLeftButton("player", 116976545042904)
--- แสดงชื่อ/รูปทันทีเหมือนกดแล้ว
-do
-    ABIcon.Image = "rbxassetid://116976545042904"
-    ABText.Text  = "player"
-    ActiveBadge.Visible = true
-end
-
 --==========================================================
 -- UFO RECOVERY PATCH (Final Fix v3: sync flag + block camera drag)
 --==========================================================
@@ -333,3 +297,37 @@ end
 hideScrollbar(LeftList)
 hideScrollbar(RightList)
 -- ========================================================================
+-- ฟังก์ชันสร้างปุ่มสี่เหลี่ยมขอบเขียว (ซ้าย) + อัปเดตป้ายชื่อ
+local function CreateLeftButton(name, assetId)
+    local H=28 -- ความสูงตามแท่งสีขาวในรูป
+    local btn=Instance.new("TextButton", LeftList)
+    btn.Name="Btn_"..name; btn.AutoButtonColor=false; btn.Size=UDim2.new(1,0,0,H)
+    btn.BackgroundColor3=Color3.fromRGB(20,20,20); btn.Text=""; btn.BorderSizePixel=0
+    corner(btn,8); local s=Instance.new("UIStroke",btn); s.Color=GREEN; s.Thickness=1.2
+
+    local iconSize=H-8
+    local ic=Instance.new("ImageLabel",btn); ic.BackgroundTransparency=1; ic.Size=UDim2.new(0,iconSize,0,iconSize); ic.Position=UDim2.new(0,6,0.5,-iconSize/2)
+    ic.Image="rbxassetid://"..tostring(assetId)
+
+    local lab=Instance.new("TextLabel",btn); lab.BackgroundTransparency=1; lab.Position=UDim2.new(0,iconSize+12,0,0); lab.Size=UDim2.new(1,-(iconSize+14),1,0)
+    lab.Font=Enum.Font.GothamSemibold; lab.TextSize=14; lab.TextColor3=TEXT_WHITE; lab.TextXAlignment=Enum.TextXAlignment.Left; lab.Text=name
+
+    btn.MouseEnter:Connect(function() btn.BackgroundColor3=Color3.fromRGB(26,26,26) end)
+    btn.MouseLeave:Connect(function() btn.BackgroundColor3=Color3.fromRGB(20,20,20) end)
+    btn.MouseButton1Click:Connect(function()
+        ABIcon.Image = ic.Image
+        ABText.Text  = name
+        ActiveBadge.Visible = true
+    end)
+
+    return btn
+end
+
+-- ====== สร้างปุ่มที่ขอ: player + รูป ======
+CreateLeftButton("player", 116976545042904)
+-- แสดงชื่อ/รูปทันทีเหมือนกดแล้ว
+do
+    ABIcon.Image = "rbxassetid://116976545042904"
+    ABText.Text  = "player"
+    ActiveBadge.Visible = true
+end
