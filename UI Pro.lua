@@ -174,17 +174,19 @@ RL:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     RightList.CanvasSize=UDim2.new(0,0,0,RL.AbsoluteContentSize.Y+8)
 end)
 
--- รูปหลักเริ่มต้นในหน้าหลัก (Right Panel)
-local MainLogo = Instance.new("ImageLabel", RightList)
+-- ===== Main logo เป็นพื้นหลัง ติดกับพาเนลขวา (ไม่เลื่อนตามสกรอลล์) =====
+RightList.ZIndex = 1 -- ให้รายการอยู่เหนือโลโก้
+local MainLogo = Instance.new("ImageLabel")
 MainLogo.Name = "MainLogo"
 MainLogo.BackgroundTransparency = 1
 MainLogo.AnchorPoint = Vector2.new(0.5, 0.5)
 MainLogo.Position = UDim2.new(0.5, 0, 0.5, 0)
-MainLogo.Size = UDim2.new(0, 240, 0, 240)
-MainLogo.Image = "rbxassetid://116415093042583" -- ใช้รูปเอเลี่ยน UFO HUB X ที่เคยใช้
-MainLogo.ImageColor3 = Color3.fromRGB(255, 255, 255)
+MainLogo.Size = UDim2.new(0, 260, 0, 260)
+MainLogo.Image = "rbxassetid://116415093042583"
 MainLogo.ScaleType = Enum.ScaleType.Fit
-MainLogo.ZIndex = 2
+MainLogo.ImageTransparency = 0 -- ถ้าอยากเนียนบาง ๆ ปรับเป็น 0.05–0.15 ได้
+MainLogo.ZIndex = 0           -- ต่ำกว่า RightList เพื่อให้เป็นพื้นหลัง
+MainLogo.Parent = Right        -- << สำคัญ! ใส่กับกรอบขวา ไม่ใช่ RightList
 
 -- ป้ายชื่อ (มุมซ้ายบนแผงขวา) แสดงไอคอน+ชื่อปุ่มที่เลือก
 local ActiveBadge = Instance.new("Frame", Right)
