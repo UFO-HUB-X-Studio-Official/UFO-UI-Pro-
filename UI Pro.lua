@@ -321,3 +321,15 @@ do
         end)
     end
 end
+-- ===== Hide scrollbars on both sides (Left & Right) but keep scrolling =====
+local function hideScrollbar(sf)
+    if not (sf and sf:IsA("ScrollingFrame")) then return end
+    -- ซ่อนทั้งแท่งและราง
+    sf.ScrollBarThickness = 0                 -- ซ่อนทันทีแบบชัวร์
+    sf.ScrollBarImageTransparency = 1         -- กันเผื่อบางเกม
+    sf.TopImage, sf.MidImage, sf.BottomImage = "", "", ""  -- ลบรางขาว
+end
+
+hideScrollbar(LeftList)
+hideScrollbar(RightList)
+-- ========================================================================
