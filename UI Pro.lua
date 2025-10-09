@@ -298,9 +298,23 @@ hideScrollbar(LeftList)
 hideScrollbar(RightList)
 -- ========================================================================
 -- ========================================================================
--- ฟังก์ชันสร้างปุ่มสี่เหลี่ยมขอบเขียว (ซ้าย) + เอฟเฟกต์กดค้าง + อัปเดตป้ายชื่อ
+-- ปุ่มซ้าย: ขอบเขียว + เอฟเฟกต์กดค้าง + สลับ active ถูกต้องเสมอ
 -- ========================================================================
-local activeButton = nil -- เก็บปุ่มที่ถูกกดอยู่ตอนนี้
+local activeButton = nil
+local LeftButtons = {} -- เก็บปุ่มทั้งหมดไว้รีเซ็ตสถานะได้
+
+local function setActive(btn)
+    for _, it in ipairs(LeftButtons) do
+        if it.btn == btn then
+            it.btn.BackgroundColor3 = it.bgActive
+            it.stroke.Color        = it.strokeActive
+        else
+            it.btn.BackgroundColor3 = it.bgDefault
+            it.stroke.Color        = it.strokeDefault
+        end
+    end
+    activeButton = btn
+end
 
 local function CreateLeftButton(name, assetId)
     local H = 28
@@ -308,21 +322,20 @@ local function CreateLeftButton(name, assetId)
     btn.Name = "Btn_" .. name
     btn.AutoButtonColor = false
     btn.Size = UDim2.new(1, 0, 0, H)
-    btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    btn.BackgroundColor3 = Color3.fromRGB(20,20,20)
     btn.Text = ""
     btn.BorderSizePixel = 0
     corner(btn, 8)
 
-    local s = Instance.new("UIStroke", btn)
-    s.Color = GREEN
-    s.Thickness = 1.2
-    s.Transparency = 0
+    local stroke = Instance.new("UIStroke", btn)
+    stroke.Color = GREEN
+    stroke.Thickness = 1.2
 
     local iconSize = H - 8
     local ic = Instance.new("ImageLabel", btn)
     ic.BackgroundTransparency = 1
     ic.Size = UDim2.new(0, iconSize, 0, iconSize)
-    ic.Position = UDim2.new(0, 6, 0.5, -iconSize / 2)
+    ic.Position = UDim2.new(0, 6, 0.5, -iconSize/2)
     ic.Image = "rbxassetid://" .. tostring(assetId)
 
     local lab = Instance.new("TextLabel", btn)
@@ -335,52 +348,59 @@ local function CreateLeftButton(name, assetId)
     lab.TextXAlignment = Enum.TextXAlignment.Left
     lab.Text = name
 
-    -- เอฟเฟกต์ Hover
+    -- เก็บค่าธีมไว้ใช้รีเซ็ต
+    local theme = {
+        bgDefault     = Color3.fromRGB(20,20,20),
+        bgHover       = Color3.fromRGB(26,26,26),
+        bgActive      = Color3.fromRGB(12,50,20),
+        strokeDefault = GREEN,
+        strokeActive  = Color3.fromRGB(0,255,120)
+    }
+    table.insert(LeftButtons, {btn=btn, stroke=stroke,
+        bgDefault=theme.bgDefault, bgActive=theme.bgActive,
+        strokeDefault=theme.strokeDefault, strokeActive=theme.strokeActive})
+
+    -- Hover เฉพาะตอนยังไม่ active
     btn.MouseEnter:Connect(function()
-        if activeButton ~= btn then
-            btn.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
-        end
+        if activeButton ~= btn then btn.BackgroundColor3 = theme.bgHover end
     end)
     btn.MouseLeave:Connect(function()
-        if activeButton ~= btn then
-            btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-        end
+        if activeButton ~= btn then btn.BackgroundColor3 = theme.bgDefault end
     end)
 
-    -- เอฟเฟกต์คลิกค้าง
+    -- คลิกแล้วสลับ active แบบรีเซ็ตทุกปุ่มให้ถูกต้องเสมอ
     btn.MouseButton1Click:Connect(function()
-        if activeButton then
-            activeButton.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-            local strokeOld = activeButton:FindFirstChildOfClass("UIStroke")
-            if strokeOld then strokeOld.Color = GREEN end
-        end
-
-        activeButton = btn
-        btn.BackgroundColor3 = Color3.fromRGB(12, 50, 20)
-        s.Color = Color3.fromRGB(0, 255, 120)
-
-        -- อัปเดต Badge ฝั่งขวา
+        setActive(btn)
+        -- อัปเดต Badge ฝั่งขวา (ไม่มีกรอบ ตามที่ตั้งไว้ก่อนหน้า)
         ABIcon.Image = ic.Image
-        ABText.Text = name
+        ABText.Text  = name
         ActiveBadge.Visible = true
     end)
 
     return btn
 end
 
--- ====== สร้างปุ่มที่ขอ: Player + รูป ======
-CreateLeftButton("Player", 116976545042904)
+-- ====== สร้างปุ่มที่ขอ: Player + รูป และตั้ง active ตั้งแต่เริ่ม ======
+local firstBtn = CreateLeftButton("Player", 116976545042904)
+setActive(firstBtn) -- ให้ปุ่มแรกติดสถานะ active เลย
+-- ========================================================================
+-- ปุ่มซ้าย: ขอบเขียว + เอฟเฟกต์กดค้าง + สลับ active ถูกต้องเสมอ
+-- ========================================================================
+local activeButton = nil
+local LeftButtons = {} -- เก็บปุ่มทั้งหมดไว้รีเซ็ตสถานะได้
 
--- ====== ปรับฝั่งขวา (ลบขอบเขียวออก เหลือแค่รูปกับชื่อ) ======
-if ActiveBadge then
-    local abStroke = ActiveBadge:FindFirstChildOfClass("UIStroke")
-    if abStroke then abStroke:Destroy() end
-    ActiveBadge.BackgroundTransparency = 1
+local function setActive(btn)
+    for _, it in ipairs(LeftButtons) do
+        if it.btn == btn then
+            it.btn.BackgroundColor3 = it.bgActive
+            it.stroke.Color        = it.strokeActive
+        else
+            it.btn.BackgroundColor3 = it.bgDefault
+            it.stroke.Color        = it.strokeDefault
+        end
+    end
+    activeButton = btn
 end
--- ========================================================================
--- ฟังก์ชันสร้างปุ่มสี่เหลี่ยมขอบเขียว (ซ้าย) + เอฟเฟกต์กดค้าง + อัปเดตป้ายชื่อ
--- ========================================================================
-local activeButton = nil -- เก็บปุ่มที่ถูกกดอยู่ตอนนี้
 
 local function CreateLeftButton(name, assetId)
     local H = 28
@@ -388,21 +408,20 @@ local function CreateLeftButton(name, assetId)
     btn.Name = "Btn_" .. name
     btn.AutoButtonColor = false
     btn.Size = UDim2.new(1, 0, 0, H)
-    btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    btn.BackgroundColor3 = Color3.fromRGB(20,20,20)
     btn.Text = ""
     btn.BorderSizePixel = 0
     corner(btn, 8)
 
-    local s = Instance.new("UIStroke", btn)
-    s.Color = GREEN
-    s.Thickness = 1.2
-    s.Transparency = 0
+    local stroke = Instance.new("UIStroke", btn)
+    stroke.Color = GREEN
+    stroke.Thickness = 1.2
 
     local iconSize = H - 8
     local ic = Instance.new("ImageLabel", btn)
     ic.BackgroundTransparency = 1
     ic.Size = UDim2.new(0, iconSize, 0, iconSize)
-    ic.Position = UDim2.new(0, 6, 0.5, -iconSize / 2)
+    ic.Position = UDim2.new(0, 6, 0.5, -iconSize/2)
     ic.Image = "rbxassetid://" .. tostring(assetId)
 
     local lab = Instance.new("TextLabel", btn)
@@ -415,45 +434,38 @@ local function CreateLeftButton(name, assetId)
     lab.TextXAlignment = Enum.TextXAlignment.Left
     lab.Text = name
 
-    -- เอฟเฟกต์ Hover
+    -- เก็บค่าธีมไว้ใช้รีเซ็ต
+    local theme = {
+        bgDefault     = Color3.fromRGB(20,20,20),
+        bgHover       = Color3.fromRGB(26,26,26),
+        bgActive      = Color3.fromRGB(12,50,20),
+        strokeDefault = GREEN,
+        strokeActive  = Color3.fromRGB(0,255,120)
+    }
+    table.insert(LeftButtons, {btn=btn, stroke=stroke,
+        bgDefault=theme.bgDefault, bgActive=theme.bgActive,
+        strokeDefault=theme.strokeDefault, strokeActive=theme.strokeActive})
+
+    -- Hover เฉพาะตอนยังไม่ active
     btn.MouseEnter:Connect(function()
-        if activeButton ~= btn then
-            btn.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
-        end
+        if activeButton ~= btn then btn.BackgroundColor3 = theme.bgHover end
     end)
     btn.MouseLeave:Connect(function()
-        if activeButton ~= btn then
-            btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-        end
+        if activeButton ~= btn then btn.BackgroundColor3 = theme.bgDefault end
     end)
 
-    -- เอฟเฟกต์คลิกค้าง
+    -- คลิกแล้วสลับ active แบบรีเซ็ตทุกปุ่มให้ถูกต้องเสมอ
     btn.MouseButton1Click:Connect(function()
-        if activeButton then
-            activeButton.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-            local strokeOld = activeButton:FindFirstChildOfClass("UIStroke")
-            if strokeOld then strokeOld.Color = GREEN end
-        end
-
-        activeButton = btn
-        btn.BackgroundColor3 = Color3.fromRGB(12, 50, 20)
-        s.Color = Color3.fromRGB(0, 255, 120)
-
-        -- อัปเดต Badge ฝั่งขวา
+        setActive(btn)
+        -- อัปเดต Badge ฝั่งขวา (ไม่มีกรอบ ตามที่ตั้งไว้ก่อนหน้า)
         ABIcon.Image = ic.Image
-        ABText.Text = name
+        ABText.Text  = name
         ActiveBadge.Visible = true
     end)
 
     return btn
 end
 
--- ====== สร้างปุ่มที่ขอ: Player + รูป ======
-CreateLeftButton("Player", 116976545042904)
-
--- ====== ปรับฝั่งขวา (ลบขอบเขียวออก เหลือแค่รูปกับชื่อ) ======
-if ActiveBadge then
-    local abStroke = ActiveBadge:FindFirstChildOfClass("UIStroke")
-    if abStroke then abStroke:Destroy() end
-    ActiveBadge.BackgroundTransparency = 1
-end
+-- ====== สร้างปุ่มที่ขอ: Player + รูป และตั้ง active ตั้งแต่เริ่ม ======
+local firstBtn = CreateLeftButton("Player", 116976545042904)
+setActive(firstBtn) -- ให้ปุ่มแรกติดสถานะ active เลย
