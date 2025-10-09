@@ -298,19 +298,19 @@ hideScrollbar(LeftList)
 hideScrollbar(RightList)
 -- ========================================================================
 -- ========================================================================
--- ปุ่มซ้าย: ขอบเขียว + เอฟเฟกต์กดค้าง + สลับ active ถูกต้องเสมอ
+-- ปุ่มซ้าย: ขอบเขียว + เอฟเฟกต์กดค้าง + สลับ active ถูกต้อง + เริ่มต้นไม่ active
 -- ========================================================================
 local activeButton = nil
-local LeftButtons = {} -- เก็บปุ่มทั้งหมดไว้รีเซ็ตสถานะได้
+local LeftButtons = {}
 
 local function setActive(btn)
     for _, it in ipairs(LeftButtons) do
         if it.btn == btn then
             it.btn.BackgroundColor3 = it.bgActive
-            it.stroke.Color        = it.strokeActive
+            it.stroke.Color = it.strokeActive
         else
             it.btn.BackgroundColor3 = it.bgDefault
-            it.stroke.Color        = it.strokeDefault
+            it.stroke.Color = it.strokeDefault
         end
     end
     activeButton = btn
@@ -322,7 +322,7 @@ local function CreateLeftButton(name, assetId)
     btn.Name = "Btn_" .. name
     btn.AutoButtonColor = false
     btn.Size = UDim2.new(1, 0, 0, H)
-    btn.BackgroundColor3 = Color3.fromRGB(20,20,20)
+    btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     btn.Text = ""
     btn.BorderSizePixel = 0
     corner(btn, 8)
@@ -335,7 +335,7 @@ local function CreateLeftButton(name, assetId)
     local ic = Instance.new("ImageLabel", btn)
     ic.BackgroundTransparency = 1
     ic.Size = UDim2.new(0, iconSize, 0, iconSize)
-    ic.Position = UDim2.new(0, 6, 0.5, -iconSize/2)
+    ic.Position = UDim2.new(0, 6, 0.5, -iconSize / 2)
     ic.Image = "rbxassetid://" .. tostring(assetId)
 
     local lab = Instance.new("TextLabel", btn)
@@ -348,19 +348,24 @@ local function CreateLeftButton(name, assetId)
     lab.TextXAlignment = Enum.TextXAlignment.Left
     lab.Text = name
 
-    -- เก็บค่าธีมไว้ใช้รีเซ็ต
+    -- ธีมพื้นฐาน
     local theme = {
-        bgDefault     = Color3.fromRGB(20,20,20),
-        bgHover       = Color3.fromRGB(26,26,26),
-        bgActive      = Color3.fromRGB(12,50,20),
+        bgDefault = Color3.fromRGB(20,20,20),
+        bgHover = Color3.fromRGB(26,26,26),
+        bgActive = Color3.fromRGB(12,50,20),
         strokeDefault = GREEN,
-        strokeActive  = Color3.fromRGB(0,255,120)
+        strokeActive = Color3.fromRGB(0,255,120)
     }
-    table.insert(LeftButtons, {btn=btn, stroke=stroke,
-        bgDefault=theme.bgDefault, bgActive=theme.bgActive,
-        strokeDefault=theme.strokeDefault, strokeActive=theme.strokeActive})
+    table.insert(LeftButtons, {
+        btn = btn,
+        stroke = stroke,
+        bgDefault = theme.bgDefault,
+        bgActive = theme.bgActive,
+        strokeDefault = theme.strokeDefault,
+        strokeActive = theme.strokeActive
+    })
 
-    -- Hover เฉพาะตอนยังไม่ active
+    -- Hover
     btn.MouseEnter:Connect(function()
         if activeButton ~= btn then btn.BackgroundColor3 = theme.bgHover end
     end)
@@ -368,35 +373,33 @@ local function CreateLeftButton(name, assetId)
         if activeButton ~= btn then btn.BackgroundColor3 = theme.bgDefault end
     end)
 
-    -- คลิกแล้วสลับ active แบบรีเซ็ตทุกปุ่มให้ถูกต้องเสมอ
+    -- คลิกเพื่อ set active
     btn.MouseButton1Click:Connect(function()
         setActive(btn)
-        -- อัปเดต Badge ฝั่งขวา (ไม่มีกรอบ ตามที่ตั้งไว้ก่อนหน้า)
         ABIcon.Image = ic.Image
-        ABText.Text  = name
+        ABText.Text = name
         ActiveBadge.Visible = true
     end)
 
     return btn
 end
 
--- ====== สร้างปุ่มที่ขอ: Player + รูป และตั้ง active ตั้งแต่เริ่ม ======
-local firstBtn = CreateLeftButton("Player", 116976545042904)
-setActive(firstBtn) -- ให้ปุ่มแรกติดสถานะ active เลย
+-- ====== ตัวอย่างปุ่ม ======
+CreateLeftButton("Player", 116976545042904)
 -- ========================================================================
--- ปุ่มซ้าย: ขอบเขียว + เอฟเฟกต์กดค้าง + สลับ active ถูกต้องเสมอ
+-- ปุ่มซ้าย: ขอบเขียว + เอฟเฟกต์กดค้าง + สลับ active ถูกต้อง + เริ่มต้นไม่ active
 -- ========================================================================
 local activeButton = nil
-local LeftButtons = {} -- เก็บปุ่มทั้งหมดไว้รีเซ็ตสถานะได้
+local LeftButtons = {}
 
 local function setActive(btn)
     for _, it in ipairs(LeftButtons) do
         if it.btn == btn then
             it.btn.BackgroundColor3 = it.bgActive
-            it.stroke.Color        = it.strokeActive
+            it.stroke.Color = it.strokeActive
         else
             it.btn.BackgroundColor3 = it.bgDefault
-            it.stroke.Color        = it.strokeDefault
+            it.stroke.Color = it.strokeDefault
         end
     end
     activeButton = btn
@@ -408,7 +411,7 @@ local function CreateLeftButton(name, assetId)
     btn.Name = "Btn_" .. name
     btn.AutoButtonColor = false
     btn.Size = UDim2.new(1, 0, 0, H)
-    btn.BackgroundColor3 = Color3.fromRGB(20,20,20)
+    btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     btn.Text = ""
     btn.BorderSizePixel = 0
     corner(btn, 8)
@@ -421,7 +424,7 @@ local function CreateLeftButton(name, assetId)
     local ic = Instance.new("ImageLabel", btn)
     ic.BackgroundTransparency = 1
     ic.Size = UDim2.new(0, iconSize, 0, iconSize)
-    ic.Position = UDim2.new(0, 6, 0.5, -iconSize/2)
+    ic.Position = UDim2.new(0, 6, 0.5, -iconSize / 2)
     ic.Image = "rbxassetid://" .. tostring(assetId)
 
     local lab = Instance.new("TextLabel", btn)
@@ -434,19 +437,24 @@ local function CreateLeftButton(name, assetId)
     lab.TextXAlignment = Enum.TextXAlignment.Left
     lab.Text = name
 
-    -- เก็บค่าธีมไว้ใช้รีเซ็ต
+    -- ธีมพื้นฐาน
     local theme = {
-        bgDefault     = Color3.fromRGB(20,20,20),
-        bgHover       = Color3.fromRGB(26,26,26),
-        bgActive      = Color3.fromRGB(12,50,20),
+        bgDefault = Color3.fromRGB(20,20,20),
+        bgHover = Color3.fromRGB(26,26,26),
+        bgActive = Color3.fromRGB(12,50,20),
         strokeDefault = GREEN,
-        strokeActive  = Color3.fromRGB(0,255,120)
+        strokeActive = Color3.fromRGB(0,255,120)
     }
-    table.insert(LeftButtons, {btn=btn, stroke=stroke,
-        bgDefault=theme.bgDefault, bgActive=theme.bgActive,
-        strokeDefault=theme.strokeDefault, strokeActive=theme.strokeActive})
+    table.insert(LeftButtons, {
+        btn = btn,
+        stroke = stroke,
+        bgDefault = theme.bgDefault,
+        bgActive = theme.bgActive,
+        strokeDefault = theme.strokeDefault,
+        strokeActive = theme.strokeActive
+    })
 
-    -- Hover เฉพาะตอนยังไม่ active
+    -- Hover
     btn.MouseEnter:Connect(function()
         if activeButton ~= btn then btn.BackgroundColor3 = theme.bgHover end
     end)
@@ -454,18 +462,16 @@ local function CreateLeftButton(name, assetId)
         if activeButton ~= btn then btn.BackgroundColor3 = theme.bgDefault end
     end)
 
-    -- คลิกแล้วสลับ active แบบรีเซ็ตทุกปุ่มให้ถูกต้องเสมอ
+    -- คลิกเพื่อ set active
     btn.MouseButton1Click:Connect(function()
         setActive(btn)
-        -- อัปเดต Badge ฝั่งขวา (ไม่มีกรอบ ตามที่ตั้งไว้ก่อนหน้า)
         ABIcon.Image = ic.Image
-        ABText.Text  = name
+        ABText.Text = name
         ActiveBadge.Visible = true
     end)
 
     return btn
 end
 
--- ====== สร้างปุ่มที่ขอ: Player + รูป และตั้ง active ตั้งแต่เริ่ม ======
-local firstBtn = CreateLeftButton("Player", 116976545042904)
-setActive(firstBtn) -- ให้ปุ่มแรกติดสถานะ active เลย
+-- ====== ตัวอย่างปุ่ม ======
+CreateLeftButton("Player", 116976545042904)
