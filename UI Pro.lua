@@ -168,14 +168,16 @@ Right.ClipsDescendants = true; corner(Right, 10); stroke(Right, 1.2, GREEN, 0); 
 
 local RightList = Instance.new("ScrollingFrame", Right)
 RightList.Name="RightList"; RightList.BackgroundTransparency=1; RightList.BorderSizePixel=0
-RightList.Position=UDim2.new(0,8,0,8); RightList.Size=UDim2.new(1,-16,1,-16); RightList.ScrollBarThickness=4
+RightList.Position=UDim2.new(0,8,0,8); RightList.Size=UDim2.new(1,-16,1,-16)
+RightList.ScrollBarThickness=0; RightList.ScrollBarImageTransparency=1
+RightList.TopImage, RightList.MidImage, RightList.BottomImage = "","",""
 local RL=Instance.new("UIListLayout", RightList); RL.Padding=UDim.new(0,8); RL.SortOrder=Enum.SortOrder.LayoutOrder
 RL:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     RightList.CanvasSize=UDim2.new(0,0,0,RL.AbsoluteContentSize.Y+8)
 end)
 
--- ===== Main logo เป็นพื้นหลัง ติดกับพาเนลขวา (ไม่เลื่อนตามสกรอลล์) =====
-RightList.ZIndex = 1 -- ให้รายการอยู่เหนือโลโก้
+-- ===== โลโก้หลักเป็น "พื้นหลัง" ของพาเนลขวา (อยู่ตลอด ไม่ถูกซ่อน) =====
+RightList.ZIndex = 2 -- รายการอยู่เหนือโลโก้
 local MainLogo = Instance.new("ImageLabel")
 MainLogo.Name = "MainLogo"
 MainLogo.BackgroundTransparency = 1
@@ -184,9 +186,83 @@ MainLogo.Position = UDim2.new(0.5, 0, 0.5, 0)
 MainLogo.Size = UDim2.new(0, 260, 0, 260)
 MainLogo.Image = "rbxassetid://116415093042583"
 MainLogo.ScaleType = Enum.ScaleType.Fit
-MainLogo.ImageTransparency = 0 -- ถ้าอยากเนียนบาง ๆ ปรับเป็น 0.05–0.15 ได้
-MainLogo.ZIndex = 0           -- ต่ำกว่า RightList เพื่อให้เป็นพื้นหลัง
-MainLogo.Parent = Right        -- << สำคัญ! ใส่กับกรอบขวา ไม่ใช่ RightList
+MainLogo.ZIndex = 0           -- ต่ำกว่าเนื้อหา
+MainLogo.Parent = Right       -- เป็นลูกของ Right เพื่อให้เป็นส่วนเดียวกับพื้นดำ
+
+-- ป้ายชื่อ (มุมซ้ายบนแผงขวา)
+local ActiveBadge = Instance.new("Frame", Right)
+ActiveBadge.Name="ActiveBadge"; ActiveBadge.Position=UDim2.new(0,14,0,12); ActiveBadge.Size=UDim2.new(0,150,0,28)
+ActiveBadge.BackgroundColor3 = Color3.fromRGB(28,28,34); ActiveBadge.BorderSizePixel=0; ActiveBadge.Visible=false; corner(ActiveBadge,8)
+local abStroke=Instance.new("UIStroke", ActiveBadge); abStroke.Color = GREEN; abStroke.Thickness=1.2
+local ABIcon=Instance.new("ImageLabel",ActiveBadge); ABIcon.Name="Icon"; ABIcon.BackgroundTransparency=1; ABIcon.Size=UDim2.new(0,20,0,20); ABIcon.Position=UDim2.new(0,6,0.5,-10)
+local ABText=Instance.new("TextLabel",ActiveBadge); ABText.Name="Text"; ABText.BackgroundTransparency=1; ABText.Position=UDim2.new(0,32,0,0); ABText.Size=UDim2.new(1,-36,1,0)
+ABText.Font=Enum.Font.GothamSemibold; ABText.TextSize=14; ABText.TextColor3=TEXT_WHITE; ABText.TextXAlignment=Enum.TextXAlignment.Left
+
+-- ========================================================================
+-- ปุ่มซ้าย: เส้นขอบเขียว + เอฟเฟกต์กดค้าง (ไม่มีการซ่อน MainLogo)
+-- ========================================================================
+local activeButton = nil
+
+local function CreateLeftButton(name, assetId)
+    local H = 28
+    local btn = Instance.new("TextButton", LeftList)
+    btn.Name = "Btn_" .. name
+    btn.AutoButtonColor = false
+    btn.Size = UDim2.new(1, 0, 0, H)
+    btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    btn.Text = ""
+    btn.BorderSizePixel = 0
+    corner(btn, 8)
+
+    local s = Instance.new("UIStroke", btn)
+    s.Color = GREEN
+    s.Thickness = 1.2
+
+    local iconSize = H - 8
+    local ic = Instance.new("ImageLabel", btn)
+    ic.BackgroundTransparency = 1
+    ic.Size = UDim2.new(0, iconSize, 0, iconSize)
+    ic.Position = UDim2.new(0, 6, 0.5, -iconSize / 2)
+    ic.Image = "rbxassetid://" .. tostring(assetId)
+
+    local lab = Instance.new("TextLabel", btn)
+    lab.BackgroundTransparency = 1
+    lab.Position = UDim2.new(0, iconSize + 12, 0, 0)
+    lab.Size = UDim2.new(1, -(iconSize + 14), 1, 0)
+    lab.Font = Enum.Font.GothamSemibold
+    lab.TextSize = 14
+    lab.TextColor3 = TEXT_WHITE
+    lab.TextXAlignment = Enum.TextXAlignment.Left
+    lab.Text = name
+
+    -- hover (เฉพาะตอนยังไม่ active)
+    btn.MouseEnter:Connect(function()
+        if activeButton ~= btn then btn.BackgroundColor3 = Color3.fromRGB(26,26,26) end
+    end)
+    btn.MouseLeave:Connect(function()
+        if activeButton ~= btn then btn.BackgroundColor3 = Color3.fromRGB(20,20,20) end
+    end)
+
+    -- click -> ทำให้ปุ่มนี้เป็น active (MainLogo ไม่ถูกแตะ ไม่ถูกซ่อน)
+    btn.MouseButton1Click:Connect(function()
+        if activeButton and activeButton ~= btn then
+            activeButton.BackgroundColor3 = Color3.fromRGB(20,20,20)
+            local oldS = activeButton:FindFirstChildOfClass("UIStroke")
+            if oldS then oldS.Color = GREEN end
+        end
+
+        activeButton = btn
+        btn.BackgroundColor3 = Color3.fromRGB(12,50,20)
+        s.Color = Color3.fromRGB(0,255,120)
+
+        ABIcon.Image = ic.Image
+        ABText.Text  = name
+        ActiveBadge.Visible = true
+        -- *** ไม่ซ่อน MainLogo ***
+    end)
+
+    return btn
+end
 
 -- ป้ายชื่อ (มุมซ้ายบนแผงขวา) แสดงไอคอน+ชื่อปุ่มที่เลือก
 local ActiveBadge = Instance.new("Frame", Right)
