@@ -159,7 +159,7 @@ LL:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     LeftList.CanvasSize=UDim2.new(0,0,0,LL.AbsoluteContentSize.Y+8)
 end)
 
--- RIGHT panel container + สกรอลล์ภายใน (เวอร์ชันรวมโลโก้เป็นพื้นหลัง)
+-- RIGHT panel container + สกรอลล์ภายใน (โลโก้เป็นพื้นหลังของพาเนลขวา)
 local Right = Instance.new("Frame", Columns)
 Right.BackgroundColor3 = Color3.fromRGB(16,16,16)
 Right.Position = UDim2.new(LEFT_RATIO, GAP_BETWEEN, 0, 0)
@@ -169,37 +169,41 @@ corner(Right, 10)
 stroke(Right, 1.2, GREEN, 0)
 stroke(Right, 0.45, MINT, 0.35)
 
--- ----- MainLogo = ส่วนเดียวกับพาเนลขวา (ไม่เลื่อนตามสกรอลล์) -----
--- ถ้ามี MainLogo เดิมอยู่ใน Right หรือ RightList ให้ลบทิ้งก่อน กันซ้ำ
-do
-    local old1 = Right:FindFirstChild("MainLogo")
-    local old2 = Right:FindFirstChild("MainLogo")
-    if old1 then old1:Destroy() end
-    if old2 then old2:Destroy() end
+-- ลบ MainLogo เดิมถ้ามี (ทั้งที่อยู่ใต้ Right และ RightList)
+for _, ch in ipairs(Right:GetChildren()) do
+    if ch.Name == "MainLogo" then ch:Destroy() end
+end
+-- เผื่อเคยสร้างใน RightList มาก่อน ให้เคลียร์ด้วยเมื่อพบ
+local oldRightList = Right:FindFirstChild("RightList")
+if oldRightList then
+    local oldLogo = oldRightList:FindFirstChild("MainLogo")
+    if oldLogo then oldLogo:Destroy() end
 end
 
+-- ===== MainLogo = พื้นหลังของพาเนลขวา (ไม่เลื่อนตาม) =====
 local MainLogo = Instance.new("ImageLabel")
 MainLogo.Name = "MainLogo"
 MainLogo.BackgroundTransparency = 1
 MainLogo.AnchorPoint = Vector2.new(0.5, 0.5)
 MainLogo.Position = UDim2.new(0.5, 0, 0.5, 0)
--- ให้ดูกลืนกับพื้นหลัง: เว้นขอบนิดหน่อยให้ไม่ทับเส้นขอบเขียว
-MainLogo.Size = UDim2.new(1, -48, 1, -48)           -- เต็มพาเนลขวาเกือบทั้งหมด
-MainLogo.Image = "rbxassetid://117052960049460"     -- << รูปเอเลี่ยนที่ต้องการ
+-- ให้กินพื้นที่เกือบเต็มพาเนล (ไม่ทับเส้นขอบเขียว)
+MainLogo.Size = UDim2.new(1, -48, 1, -48)
+MainLogo.Image = "rbxassetid://117052960049460"   -- << ไอดีรูปที่ต้องการ
+MainLogo.ImageColor3 = Color3.fromRGB(255,255,255)
 MainLogo.ScaleType = Enum.ScaleType.Fit
-MainLogo.ImageTransparency = 0                       -- ถ้าอยากจาง ๆ ใช้ 0.08 ได้
-MainLogo.ZIndex = 0                                  -- เป็นพื้นหลัง
-MainLogo.Parent = Right                              -- สำคัญ! เป็นลูกของ Right
+MainLogo.ImageTransparency = 0
+MainLogo.ZIndex = 0        -- เป็นพื้นหลัง
+MainLogo.Parent = Right    -- สำคัญ: เป็นลูกของ Right
 
--- ----- RightList = รายการที่เลื่อนทับโลโก้ (เลื่อนได้ตามเดิม) -----
+-- ===== RightList = รายการที่เลื่อนอยู่ “เหนือ” โลโก้ =====
 local RightList = Instance.new("ScrollingFrame", Right)
 RightList.Name = "RightList"
-RightList.BackgroundTransparency = 1                 -- โปร่งใสเพื่อเห็นโลโก้ด้านหลัง
+RightList.BackgroundTransparency = 1       -- โปร่งใสเพื่อให้เห็นโลโก้
 RightList.BorderSizePixel = 0
 RightList.Position = UDim2.new(0,8,0,8)
 RightList.Size = UDim2.new(1,-16,1,-16)
-RightList.ZIndex = 1                                  -- อยู่เหนือ MainLogo
--- ซ่อนสกรอลบาร์ แต่ยังเลื่อนได้ปกติ
+RightList.ZIndex = 1                       -- อยู่เหนือ MainLogo
+-- ซ่อนสกรอลบาร์ แต่ยังเลื่อนได้เหมือนเดิม
 RightList.ScrollBarThickness = 0
 RightList.ScrollBarImageTransparency = 1
 RightList.TopImage, RightList.MidImage, RightList.BottomImage = "","",""
