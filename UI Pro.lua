@@ -297,37 +297,163 @@ end
 hideScrollbar(LeftList)
 hideScrollbar(RightList)
 -- ========================================================================
--- ฟังก์ชันสร้างปุ่มสี่เหลี่ยมขอบเขียว (ซ้าย) + อัปเดตป้ายชื่อ
+-- ========================================================================
+-- ฟังก์ชันสร้างปุ่มสี่เหลี่ยมขอบเขียว (ซ้าย) + เอฟเฟกต์กดค้าง + อัปเดตป้ายชื่อ
+-- ========================================================================
+local activeButton = nil -- เก็บปุ่มที่ถูกกดอยู่ตอนนี้
+
 local function CreateLeftButton(name, assetId)
-    local H=28 -- ความสูงตามแท่งสีขาวในรูป
-    local btn=Instance.new("TextButton", LeftList)
-    btn.Name="Btn_"..name; btn.AutoButtonColor=false; btn.Size=UDim2.new(1,0,0,H)
-    btn.BackgroundColor3=Color3.fromRGB(20,20,20); btn.Text=""; btn.BorderSizePixel=0
-    corner(btn,8); local s=Instance.new("UIStroke",btn); s.Color=GREEN; s.Thickness=1.2
+    local H = 28
+    local btn = Instance.new("TextButton", LeftList)
+    btn.Name = "Btn_" .. name
+    btn.AutoButtonColor = false
+    btn.Size = UDim2.new(1, 0, 0, H)
+    btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    btn.Text = ""
+    btn.BorderSizePixel = 0
+    corner(btn, 8)
 
-    local iconSize=H-8
-    local ic=Instance.new("ImageLabel",btn); ic.BackgroundTransparency=1; ic.Size=UDim2.new(0,iconSize,0,iconSize); ic.Position=UDim2.new(0,6,0.5,-iconSize/2)
-    ic.Image="rbxassetid://"..tostring(assetId)
+    local s = Instance.new("UIStroke", btn)
+    s.Color = GREEN
+    s.Thickness = 1.2
+    s.Transparency = 0
 
-    local lab=Instance.new("TextLabel",btn); lab.BackgroundTransparency=1; lab.Position=UDim2.new(0,iconSize+12,0,0); lab.Size=UDim2.new(1,-(iconSize+14),1,0)
-    lab.Font=Enum.Font.GothamSemibold; lab.TextSize=14; lab.TextColor3=TEXT_WHITE; lab.TextXAlignment=Enum.TextXAlignment.Left; lab.Text=name
+    local iconSize = H - 8
+    local ic = Instance.new("ImageLabel", btn)
+    ic.BackgroundTransparency = 1
+    ic.Size = UDim2.new(0, iconSize, 0, iconSize)
+    ic.Position = UDim2.new(0, 6, 0.5, -iconSize / 2)
+    ic.Image = "rbxassetid://" .. tostring(assetId)
 
-    btn.MouseEnter:Connect(function() btn.BackgroundColor3=Color3.fromRGB(26,26,26) end)
-    btn.MouseLeave:Connect(function() btn.BackgroundColor3=Color3.fromRGB(20,20,20) end)
+    local lab = Instance.new("TextLabel", btn)
+    lab.BackgroundTransparency = 1
+    lab.Position = UDim2.new(0, iconSize + 12, 0, 0)
+    lab.Size = UDim2.new(1, -(iconSize + 14), 1, 0)
+    lab.Font = Enum.Font.GothamSemibold
+    lab.TextSize = 14
+    lab.TextColor3 = TEXT_WHITE
+    lab.TextXAlignment = Enum.TextXAlignment.Left
+    lab.Text = name
+
+    -- เอฟเฟกต์ Hover
+    btn.MouseEnter:Connect(function()
+        if activeButton ~= btn then
+            btn.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
+        end
+    end)
+    btn.MouseLeave:Connect(function()
+        if activeButton ~= btn then
+            btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+        end
+    end)
+
+    -- เอฟเฟกต์คลิกค้าง
     btn.MouseButton1Click:Connect(function()
+        if activeButton then
+            activeButton.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+            local strokeOld = activeButton:FindFirstChildOfClass("UIStroke")
+            if strokeOld then strokeOld.Color = GREEN end
+        end
+
+        activeButton = btn
+        btn.BackgroundColor3 = Color3.fromRGB(12, 50, 20)
+        s.Color = Color3.fromRGB(0, 255, 120)
+
+        -- อัปเดต Badge ฝั่งขวา
         ABIcon.Image = ic.Image
-        ABText.Text  = name
+        ABText.Text = name
         ActiveBadge.Visible = true
     end)
 
     return btn
 end
 
--- ====== สร้างปุ่มที่ขอ: player + รูป ======
+-- ====== สร้างปุ่มที่ขอ: Player + รูป ======
 CreateLeftButton("Player", 116976545042904)
--- แสดงชื่อ/รูปทันทีเหมือนกดแล้ว
-do
-    ABIcon.Image = "rbxassetid://116976545042904"
-    ABText.Text  = "Player"
-    ActiveBadge.Visible = true
+
+-- ====== ปรับฝั่งขวา (ลบขอบเขียวออก เหลือแค่รูปกับชื่อ) ======
+if ActiveBadge then
+    local abStroke = ActiveBadge:FindFirstChildOfClass("UIStroke")
+    if abStroke then abStroke:Destroy() end
+    ActiveBadge.BackgroundTransparency = 1
+end
+-- ========================================================================
+-- ฟังก์ชันสร้างปุ่มสี่เหลี่ยมขอบเขียว (ซ้าย) + เอฟเฟกต์กดค้าง + อัปเดตป้ายชื่อ
+-- ========================================================================
+local activeButton = nil -- เก็บปุ่มที่ถูกกดอยู่ตอนนี้
+
+local function CreateLeftButton(name, assetId)
+    local H = 28
+    local btn = Instance.new("TextButton", LeftList)
+    btn.Name = "Btn_" .. name
+    btn.AutoButtonColor = false
+    btn.Size = UDim2.new(1, 0, 0, H)
+    btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    btn.Text = ""
+    btn.BorderSizePixel = 0
+    corner(btn, 8)
+
+    local s = Instance.new("UIStroke", btn)
+    s.Color = GREEN
+    s.Thickness = 1.2
+    s.Transparency = 0
+
+    local iconSize = H - 8
+    local ic = Instance.new("ImageLabel", btn)
+    ic.BackgroundTransparency = 1
+    ic.Size = UDim2.new(0, iconSize, 0, iconSize)
+    ic.Position = UDim2.new(0, 6, 0.5, -iconSize / 2)
+    ic.Image = "rbxassetid://" .. tostring(assetId)
+
+    local lab = Instance.new("TextLabel", btn)
+    lab.BackgroundTransparency = 1
+    lab.Position = UDim2.new(0, iconSize + 12, 0, 0)
+    lab.Size = UDim2.new(1, -(iconSize + 14), 1, 0)
+    lab.Font = Enum.Font.GothamSemibold
+    lab.TextSize = 14
+    lab.TextColor3 = TEXT_WHITE
+    lab.TextXAlignment = Enum.TextXAlignment.Left
+    lab.Text = name
+
+    -- เอฟเฟกต์ Hover
+    btn.MouseEnter:Connect(function()
+        if activeButton ~= btn then
+            btn.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
+        end
+    end)
+    btn.MouseLeave:Connect(function()
+        if activeButton ~= btn then
+            btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+        end
+    end)
+
+    -- เอฟเฟกต์คลิกค้าง
+    btn.MouseButton1Click:Connect(function()
+        if activeButton then
+            activeButton.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+            local strokeOld = activeButton:FindFirstChildOfClass("UIStroke")
+            if strokeOld then strokeOld.Color = GREEN end
+        end
+
+        activeButton = btn
+        btn.BackgroundColor3 = Color3.fromRGB(12, 50, 20)
+        s.Color = Color3.fromRGB(0, 255, 120)
+
+        -- อัปเดต Badge ฝั่งขวา
+        ABIcon.Image = ic.Image
+        ABText.Text = name
+        ActiveBadge.Visible = true
+    end)
+
+    return btn
+end
+
+-- ====== สร้างปุ่มที่ขอ: Player + รูป ======
+CreateLeftButton("Player", 116976545042904)
+
+-- ====== ปรับฝั่งขวา (ลบขอบเขียวออก เหลือแค่รูปกับชื่อ) ======
+if ActiveBadge then
+    local abStroke = ActiveBadge:FindFirstChildOfClass("UIStroke")
+    if abStroke then abStroke:Destroy() end
+    ActiveBadge.BackgroundTransparency = 1
 end
