@@ -149,7 +149,8 @@ Columns.BackgroundTransparency = 1; Columns.Position = UDim2.new(0,8,0,8); Colum
 -- LEFT panel container (มีกรอบเหมือนเดิม) + สกรอลล์ภายใน
 local Left = Instance.new("Frame", Columns)
 Left.BackgroundColor3 = Color3.fromRGB(16,16,16); Left.Size = UDim2.new(LEFT_RATIO, -GAP_BETWEEN/2, 1, 0)
-Left.ClipsDescendants = true; corner(Left, 10); stroke(Left, 1.2, GREEN, 0);
+Left.ClipsDescendants = true; corner(Left, 10); stroke(Left, 1.2, GREEN, 0); stroke(Left, 0.45, MINT, 0.35)
+
 local LeftList = Instance.new("ScrollingFrame", Left)
 LeftList.Name="LeftList"; LeftList.BackgroundTransparency=1; LeftList.BorderSizePixel=0
 LeftList.Position=UDim2.new(0,8,0,8); LeftList.Size=UDim2.new(1,-16,1,-16); LeftList.ScrollBarThickness=3
@@ -163,7 +164,7 @@ local Right = Instance.new("Frame", Columns)
 Right.BackgroundColor3 = Color3.fromRGB(16,16,16)
 Right.Position = UDim2.new(LEFT_RATIO, GAP_BETWEEN, 0, 0)
 Right.Size = UDim2.new(RIGHT_RATIO, -GAP_BETWEEN/2, 1, 0)
-Right.ClipsDescendants = true; corner(Right, 10); stroke(Right, 1.2, GREEN, 0);
+Right.ClipsDescendants = true; corner(Right, 10); stroke(Right, 1.2, GREEN, 0); stroke(Right, 0.45, MINT, 0.35)
 
 local RightList = Instance.new("ScrollingFrame", Right)
 RightList.Name="RightList"; RightList.BackgroundTransparency=1; RightList.BorderSizePixel=0
@@ -216,6 +217,7 @@ do
     ABText.Text  = "player"
     ActiveBadge.Visible = true
 end
+
 --==========================================================
 -- UFO RECOVERY PATCH (Final Fix v3: sync flag + block camera drag)
 --==========================================================
@@ -319,4 +321,3 @@ do
         end)
     end
 end
-
